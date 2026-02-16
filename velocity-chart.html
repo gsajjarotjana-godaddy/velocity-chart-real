@@ -1,0 +1,460 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Velocity Chart</title>
+  <style>
+    * {
+      box-sizing: border-box;
+    }
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, sans-serif;
+      margin: 0;
+      padding: 8px;
+      background: #f0f0f0;
+    }
+    .chart-wrapper {
+      display: flex;
+      max-width: 1100px;
+      border: 2px solid #000;
+      border-radius: 12px;
+      overflow: hidden;
+      background: #000;
+      padding: 8px;
+    }
+    .left-panel {
+      background: #000;
+      padding: 0;
+      min-width: 260px;
+      display: flex;
+      flex-direction: column;
+      gap: 1.5rem;
+    }
+    .chart-title {
+      color: #fff;
+      font-size: 1.25rem;
+      font-weight: 700;
+      margin: 0;
+      padding-top: 0.7rem;
+    }
+    .contributor-section {
+      display: flex;
+      flex-direction: column;
+      gap: 6.5px;
+      margin-top: 0.05rem;
+    }
+    #contributor-rows {
+      display: flex;
+      flex-direction: column;
+      gap: 6.5px;
+    }
+    .contributor-header-row {
+      display: flex;
+      gap: 6.5px;
+      align-items: stretch;
+    }
+    .contributor-header {
+      background: #09757A;
+      color: #fff;
+      font-weight: 600;
+      font-size: 13px;
+      padding: 0.5rem 0.75rem;
+      border-radius: 8px;
+      flex: 1;
+      min-width: 0;
+      max-width: 140px;
+      display: flex;
+      align-items: center;
+    }
+    .low-high-header {
+      background: #09757A;
+      color: #fff;
+      font-weight: 600;
+      font-size: 13px;
+      padding: 0.5rem 0.6rem;
+      border-radius: 8px;
+      width: 48px;
+      text-align: center;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .contributor-row {
+      display: flex;
+      gap: 6.5px;
+      align-items: stretch;
+    }
+    .contributor-input {
+      background: #1D1D1D;
+      color: #fff;
+      border: none;
+      padding: 0.5rem 0.4rem;
+      border-radius: 8px;
+      flex: 1;
+      min-width: 0;
+      max-width: 140px;
+      font-size: 14px;
+    }
+    .contributor-input::placeholder {
+      color: #888;
+    }
+    .contributor-input:focus {
+      outline: 2px solid #fff;
+      outline-offset: -2px;
+    }
+    .low-high-input {
+      background: #1D1D1D;
+      color: #fff;
+      border: none;
+      padding: 0.5rem 0.4rem;
+      border-radius: 8px;
+      width: 48px;
+      text-align: center;
+      font-size: 14px;
+    }
+    .low-high-input:focus {
+      outline: 2px solid #fff;
+      outline-offset: -2px;
+    }
+    .top-bar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 0.5rem;
+      background: #D8EFEF;
+    }
+    .multiplier-section {
+      display: flex;
+      gap: 0.5rem;
+      align-items: center;
+    }
+    .multiplier-label {
+      background: #fff;
+      color: #000;
+      font-weight: 600;
+      padding: 0.5rem 0.75rem;
+      border-radius: 8px;
+      font-size: 13px;
+      white-space: nowrap;
+    }
+    .multiplier-value {
+      background: #fff;
+      color: #000;
+      border: none;
+      padding: 0.5rem 0.6rem;
+      border-radius: 8px;
+      width: 52px;
+      text-align: center;
+      font-size: 14px;
+      font-weight: 600;
+    }
+    .multiplier-value:focus {
+      outline: 2px solid #09757A;
+      outline-offset: -2px;
+    }
+    .teal-wrapper {
+      flex: 1;
+      background: #D8EFEF;
+      padding: 8px;
+      border-radius: 10px;
+      min-width: 0;
+      display: flex;
+      flex-direction: column;
+    }
+    .right-panel {
+      flex: 1;
+      background: transparent;
+      display: flex;
+      flex-direction: column;
+      min-width: 0;
+    }
+    .month-header {
+      background: #D8EFEF;
+      color: #000;
+      font-weight: 600;
+      padding: 0.4rem 0.75rem;
+      padding-left: 9px;
+      font-size: 18px;
+      flex: 1;
+      display: flex;
+      align-items: center;
+      text-align: left;
+    }
+    .white-content {
+      flex: 0 0 auto;
+      background: #fff;
+      border-radius: 5px;
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+      padding: 3px;
+      margin-top: 8px;
+    }
+    .grid-table thead th {
+      background: #09757A;
+      color: #fff;
+      padding: 0.5rem 0.4rem;
+      border-radius: 8px;
+      text-align: center;
+      font-size: 13px;
+      font-weight: 500;
+      width: 1%;
+    }
+    .grid-table thead th.empty {
+      color: #fff;
+    }
+    .grid-table thead th:focus {
+      outline: 2px solid #fff;
+      outline-offset: -2px;
+    }
+    .multiplier-label:focus {
+      outline: 2px solid #09757A;
+      outline-offset: -2px;
+    }
+    .month-header:focus {
+      outline: none;
+    }
+    .grid-wrapper {
+      flex: 0 0 auto;
+      padding: 0;
+      overflow: auto;
+    }
+    .grid-table {
+      width: 100%;
+      border-collapse: separate;
+      border-spacing: 6px;
+      table-layout: fixed;
+    }
+    .grid-table td {
+      background: #F0EFEF;
+      border-radius: 8px;
+      padding: 0.5rem 0.4rem;
+      min-width: 56px;
+      width: 1%;
+      text-align: center;
+      font-size: 14px;
+      cursor: text;
+    }
+    .grid-table td:focus {
+      outline: 2px solid #fff;
+      outline-offset: -2px;
+    }
+    .grid-table td.special {
+      background: #add8e6;
+    }
+    .contributor-name-cell {
+      background: #2d2d2d;
+      color: #fff;
+      border: none;
+      padding: 0.5rem 0.75rem;
+      width: 100%;
+      font-size: 14px;
+      border-radius: 4px;
+    }
+  </style>
+</head>
+<body>
+  <div class="chart-wrapper" id="chart-wrapper">
+    <div class="left-panel">
+      <h1 class="chart-title">Velocity Chart</h1>
+      <div class="contributor-section">
+        <div class="contributor-header-row">
+          <span class="contributor-header">Contributor</span>
+          <span class="low-high-header">Low</span>
+          <span class="low-high-header">High</span>
+        </div>
+        <div id="contributor-rows"></div>
+      </div>
+    </div>
+    <div class="teal-wrapper">
+      <div class="right-panel">
+        <div class="top-bar">
+          <div class="month-header" id="month-header" contenteditable="true">February 2026</div>
+          <div class="multiplier-section">
+            <span class="multiplier-label" id="multiplier-label" contenteditable="true">Points Multiplier (Low)</span>
+            <input type="text" class="multiplier-value" id="multiplier-input" value="0.6" />
+          </div>
+        </div>
+        <div class="white-content">
+          <div class="grid-wrapper">
+            <table class="grid-table" id="grid-table">
+              <thead><tr id="dates-row"></tr></thead>
+              <tbody id="grid-body"></tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <script>
+    var STORAGE_KEY = 'velocityChartData';
+    var NUM_COLUMNS = 10;
+    var DEFAULT_DATES = ['2/17/26', '2/18/26', '', '', '', '', '', '', '', ''];
+    var DEFAULT_ROWS = [
+      { name: '', low: '', high: '', points: ['', '', '', '', '', '', '', '', '', ''], pointSpecials: [] },
+      { name: '', low: '', high: '', points: ['', '', '', '', '', '', '', '', '', ''], pointSpecials: [] },
+      { name: '', low: '', high: '', points: ['', '', '', '', '', '', '', '', '', ''], pointSpecials: [] }
+    ];
+
+    function getStoredOrDefault() {
+      try {
+        var raw = localStorage.getItem(STORAGE_KEY);
+        if (raw) {
+          var data = JSON.parse(raw);
+          if (data.rows && data.rows.length) {
+            if (!data.month) data.month = 'February 2026';
+            if (data.dates && data.dates.length > NUM_COLUMNS) data.dates = data.dates.slice(0, NUM_COLUMNS);
+            return data;
+          }
+        }
+      } catch (e) {}
+      return {
+        month: 'February 2026',
+        dates: DEFAULT_DATES.slice(),
+        rows: DEFAULT_ROWS.map(function(r) {
+          return {
+            name: r.name,
+            low: r.low,
+            high: r.high,
+            points: (r.points || []).slice(),
+            pointSpecials: (r.pointSpecials || []).slice()
+          };
+        }),
+        multiplier: '0.6'
+      };
+    }
+
+    function getChartData() {
+      var data = {
+        month: document.getElementById('month-header').textContent.trim(),
+        dates: [],
+        rows: [],
+        multiplier: document.getElementById('multiplier-input').value.trim()
+      };
+      var dateCells = document.querySelectorAll('#dates-row th');
+      for (var i = 0; i < dateCells.length; i++)
+        data.dates.push(dateCells[i].textContent.trim());
+      var rowContainers = document.querySelectorAll('#contributor-rows .contributor-row');
+      var gridRows = document.querySelectorAll('#grid-body tr');
+      for (var r = 0; r < rowContainers.length; r++) {
+        var nameEl = rowContainers[r].querySelector('.contributor-input');
+        var lowEl = rowContainers[r].querySelector('.low-high-input.low');
+        var highEl = rowContainers[r].querySelector('.low-high-input.high');
+        var points = [];
+        var pointSpecials = [];
+        if (gridRows[r]) {
+          var cells = gridRows[r].querySelectorAll('td');
+          for (var c = 0; c < cells.length; c++) {
+            points.push(cells[c].textContent.trim());
+            pointSpecials.push(cells[c].classList.contains('special'));
+          }
+        }
+        data.rows.push({
+          name: nameEl ? nameEl.value.trim() : '',
+          low: lowEl ? lowEl.value.trim() : '',
+          high: highEl ? highEl.value.trim() : '',
+          points: points,
+          pointSpecials: pointSpecials
+        });
+      }
+      return data;
+    }
+
+    function saveChartData() {
+      try {
+        localStorage.setItem(STORAGE_KEY, JSON.stringify(getChartData()));
+      } catch (e) {}
+    }
+
+    function render(data) {
+      var r, c, row, cell, tr, td;
+      var rowsContainer = document.getElementById('contributor-rows');
+      var datesRow = document.getElementById('dates-row');
+      var gridBody = document.getElementById('grid-body');
+      var monthHeader = document.getElementById('month-header');
+
+      monthHeader.textContent = data.month || 'February 2026';
+      datesRow.innerHTML = '';
+      var dates = (data.dates && data.dates.length ? data.dates : DEFAULT_DATES).slice(0, NUM_COLUMNS);
+      while (dates.length < NUM_COLUMNS) dates.push('');
+      for (c = 0; c < NUM_COLUMNS; c++) {
+        cell = document.createElement('th');
+        cell.className = dates[c] ? '' : 'empty';
+        cell.contentEditable = 'true';
+        cell.textContent = dates[c] || '';
+        cell.dataset.col = c;
+        datesRow.appendChild(cell);
+      }
+
+      rowsContainer.innerHTML = '';
+      gridBody.innerHTML = '';
+      var rowCount = (data.rows && data.rows.length) ? data.rows.length : 3;
+      var rows = data.rows || [];
+      for (r = 0; r < rowCount; r++) {
+        var rec = rows[r] || { name: '', low: '', high: '', points: [], pointSpecials: [] };
+        row = document.createElement('div');
+        row.className = 'contributor-row';
+        row.innerHTML =
+          '<input type="text" class="contributor-input" placeholder="Name" value="' + escapeHtml(rec.name) + '" data-row="' + r + '" />' +
+          '<input type="text" class="low-high-input low" placeholder="—" value="' + escapeHtml(rec.low) + '" data-row="' + r + '" />' +
+          '<input type="text" class="low-high-input high" placeholder="—" value="' + escapeHtml(rec.high) + '" data-row="' + r + '" />';
+        rowsContainer.appendChild(row);
+
+        tr = document.createElement('tr');
+        var points = (rec.points || []).slice(0, NUM_COLUMNS);
+        var specials = (rec.pointSpecials || []).slice(0, NUM_COLUMNS);
+        while (points.length < NUM_COLUMNS) points.push('');
+        while (specials.length < NUM_COLUMNS) specials.push(false);
+        for (c = 0; c < NUM_COLUMNS; c++) {
+          td = document.createElement('td');
+          td.contentEditable = 'true';
+          td.textContent = points[c] || '';
+          if (specials[c]) td.classList.add('special');
+          td.dataset.row = r;
+          td.dataset.col = c;
+          tr.appendChild(td);
+        }
+        gridBody.appendChild(tr);
+      }
+
+      document.getElementById('multiplier-input').value = data.multiplier != null ? data.multiplier : '0.6';
+    }
+
+    function escapeHtml(s) {
+      if (s == null) return '';
+      var div = document.createElement('div');
+      div.textContent = s;
+      return div.innerHTML.replace(/"/g, '&quot;');
+    }
+
+    function attachListeners() {
+      function onEdit() { saveChartData(); }
+      document.querySelectorAll('.contributor-input, .low-high-input, .multiplier-value').forEach(function(el) {
+        el.addEventListener('input', onEdit);
+        el.addEventListener('change', onEdit);
+      });
+      document.querySelectorAll('#grid-body td').forEach(function(td) {
+        td.addEventListener('input', onEdit);
+        td.addEventListener('blur', onEdit);
+      });
+      document.querySelectorAll('#dates-row th').forEach(function(cell) {
+        cell.addEventListener('input', onEdit);
+        cell.addEventListener('blur', onEdit);
+      });
+      document.getElementById('month-header').addEventListener('input', onEdit);
+      document.getElementById('month-header').addEventListener('blur', onEdit);
+    }
+
+    document.addEventListener('DOMContentLoaded', function() {
+      var data = getStoredOrDefault();
+      if (data.rows && data.rows.length > 3) {
+        while (data.rows.length > 0 && !data.rows[data.rows.length - 1].name && data.rows.length > 3)
+          data.rows.pop();
+      }
+      render(data);
+      attachListeners();
+    });
+  </script>
+</body>
+</html>
