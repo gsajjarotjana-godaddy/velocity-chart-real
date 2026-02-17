@@ -744,6 +744,15 @@
       return holidays.indexOf(iso) !== -1;
     }
 
+    function isVacationDay(dateStr, rec) {
+      var iso = gridDateToISO(dateStr);
+      if (!iso) return false;
+      var overrides = rec.vacationOverrides || {};
+      if (overrides[iso] === false) return false;
+      if (overrides[iso] === true) return true;
+      return isHolidayForRow(dateStr, rec);
+    }
+
     function getSprintStartTuesday(d) {
       var date = new Date(d.getFullYear(), d.getMonth(), d.getDate());
       var day = date.getDay();
@@ -829,7 +838,7 @@
         dateCells[i].textContent = dates[i];
         dateCells[i].className = dates[i] ? '' : 'empty';
       }
-      // Re-apply holiday logic for this sprint's dates so islands show correctly
+      // Re-apply holiday + vacation overrides for this sprint's dates
       var gridRows = document.querySelectorAll('#grid-body tr');
       var rowContainers = document.querySelectorAll('#contributor-rows .contributor-row');
       for (var r = 0; r < gridRows.length; r++) {
@@ -839,13 +848,14 @@
           if (nameEl) rec.name = nameEl.value.trim();
           rec.holidayCountry = rowContainers[r].dataset.holidayCountry || '';
           try { rec.customHolidays = JSON.parse(rowContainers[r].dataset.customHolidays || '[]'); } catch (e) { rec.customHolidays = []; }
+          try { rec.vacationOverrides = JSON.parse(rowContainers[r].dataset.vacationOverrides || '{}'); } catch (e) { rec.vacationOverrides = {}; }
         }
         var cells = gridRows[r].querySelectorAll('td');
         for (var c = 0; c < cells.length && c < dates.length; c++) {
           var dateStr = dates[c];
-          var isHoliday = isHolidayForRow(dateStr, rec);
+          var isVacation = isVacationDay(dateStr, rec);
           var td = cells[c];
-          if (isHoliday) {
+          if (isVacation) {
             td.textContent = '\u{1F334}';
             td.classList.add('island');
           } else {
@@ -942,6 +952,10 @@
         if (rowDiv && rowDiv.dataset.customHolidays) {
           try { customHolidays = JSON.parse(rowDiv.dataset.customHolidays); } catch (e) {}
         }
+        var vacationOverrides = {};
+        if (rowDiv && rowDiv.dataset.vacationOverrides) {
+          try { vacationOverrides = JSON.parse(rowDiv.dataset.vacationOverrides); } catch (e) {}
+        }
         data.rows.push({
           name: nameEl ? nameEl.value.trim() : '',
           low: lowEl ? lowEl.value.trim() : '',
@@ -949,7 +963,8 @@
           points: points,
           pointSpecials: pointSpecials,
           holidayCountry: holidayCountry || undefined,
-          customHolidays: customHolidays.length ? customHolidays : undefined
+          customHolidays: customHolidays.length ? customHolidays : undefined,
+          vacationOverrides: Object.keys(vacationOverrides).length ? vacationOverrides : undefined
         });
       }
       return data;
@@ -1041,6 +1056,7 @@
         row.draggable = true;
         row.dataset.holidayCountry = rec.holidayCountry || '';
         row.dataset.customHolidays = JSON.stringify(rec.customHolidays || []);
+        row.dataset.vacationOverrides = JSON.stringify(rec.vacationOverrides || {});
         row.innerHTML =
           '<input type="text" class="contributor-input" placeholder="Name" value="' + escapeHtml(rec.name) + '" data-row="' + r + '" />' +
           '<input type="text" class="low-high-input low" placeholder="—" value="' + escapeHtml(rec.low) + '" data-row="' + r + '" />' +
@@ -1055,9 +1071,9 @@
         for (c = 0; c < NUM_COLUMNS; c++) {
           td = document.createElement('td');
           var dateStr = dates[c];
-          var isHoliday = isHolidayForRow(dateStr, rec);
+          var isVacation = isVacationDay(dateStr, rec);
           var pt;
-          if (isHoliday) {
+          if (isVacation) {
             pt = '\u{1F334}';
           } else {
             pt = (points[c] && points[c] !== '\u{1F334}') ? points[c] : '2';
@@ -1155,18 +1171,37 @@
         saveChartData();
       });
 
-      document.querySelectorAll('#grid-body td').forEach(function(td) {
-        td.addEventListener('click', function(e) {
-          if (this.classList.contains('island')) {
-            this.textContent = '2';
-            this.classList.remove('island');
-          } else {
-            this.textContent = '\u{1F334}';
-            this.classList.add('island');
-          }
-          updateLowFromPoints();
-          saveChartData();
-        });
+      document.getElementById('grid-body').addEventListener('click', function(e) {
+        var td = e.target.closest('td');
+        if (!td || !td.closest('#grid-body')) return;
+        var rowIndex = parseInt(td.dataset.row, 10);
+        var colIndex = parseInt(td.dataset.col, 10);
+        var dateTh = document.querySelector('#dates-row th[data-col="' + colIndex + '"]');
+        if (!dateTh) return;
+        var dateStr = dateTh.textContent.trim();
+        var iso = gridDateToISO(dateStr);
+        if (!iso) return;
+        var rowContainers = document.querySelectorAll('#contributor-rows .contributor-row');
+        var rowDiv = rowContainers[rowIndex];
+        if (!rowDiv) return;
+        var vacationOverrides = {};
+        try { vacationOverrides = JSON.parse(rowDiv.dataset.vacationOverrides || '{}'); } catch (err) {}
+        var isCurrentlyIsland = td.classList.contains('island');
+        if (isCurrentlyIsland) {
+          vacationOverrides[iso] = false;
+        } else {
+          vacationOverrides[iso] = true;
+        }
+        rowDiv.dataset.vacationOverrides = JSON.stringify(vacationOverrides);
+        if (isCurrentlyIsland) {
+          td.textContent = '2';
+          td.classList.remove('island');
+        } else {
+          td.textContent = '\u{1F334}';
+          td.classList.add('island');
+        }
+        updateLowFromPoints();
+        saveChartData();
       });
       document.querySelectorAll('#dates-row th').forEach(function(cell) {
         cell.addEventListener('input', onEdit);
