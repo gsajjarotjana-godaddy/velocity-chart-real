@@ -13,6 +13,10 @@
       margin: 0;
       padding: 8px;
       background: #f0f0f0;
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
     }
     .chart-wrapper {
       display: flex;
@@ -35,7 +39,7 @@
       display: flex;
       align-items: center;
       gap: 0.35rem;
-      padding-top: 0.7rem;
+      padding-top: 0.5rem;
     }
     .chart-title-wrap .chart-title {
       flex: 1;
@@ -53,14 +57,14 @@
     .chart-title {
       color: #fff;
       font-size: 1.25rem;
-      font-weight: 700;
+      font-weight: 600;
       margin: 0;
     }
     .contributor-section {
       display: flex;
       flex-direction: column;
       gap: 6.5px;
-      margin-top: 0.05rem;
+      margin-top: calc(-0.1rem - 2px);
     }
     #contributor-rows {
       display: flex;
@@ -102,6 +106,10 @@
       display: flex;
       gap: 6.5px;
       align-items: stretch;
+      cursor: grab;
+    }
+    .contributor-row:active {
+      cursor: grabbing;
     }
     .contributor-input {
       background: #1D1D1D;
@@ -134,6 +142,12 @@
     .low-high-input:focus {
       outline: 2px solid #fff;
       outline-offset: -2px;
+    }
+    .low-high-input.low {
+      color: #FFB3B3;
+    }
+    .low-high-input.high {
+      color: #BEFFC3;
     }
     .top-bar {
       display: flex;
@@ -235,7 +249,7 @@
       flex-direction: column;
       overflow: hidden;
       padding: 3px;
-      margin-top: 8px;
+      margin-top: 5px;
     }
     .grid-table thead th {
       background: #09757A;
@@ -268,6 +282,7 @@
     }
     .grid-table {
       width: 100%;
+      min-width: 620px;
       border-collapse: separate;
       border-spacing: 6px;
       table-layout: fixed;
@@ -301,6 +316,227 @@
       font-size: 14px;
       border-radius: 4px;
     }
+    .add-contributor-btn {
+      background: none;
+      border: none;
+      padding: 0.25rem;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .add-contributor-btn:hover { opacity: 0.85; }
+    .add-contributor-btn:focus { outline: none; }
+    #random-btn img {
+      filter: brightness(0) invert(1);
+    }
+    .modal-overlay {
+      display: none;
+      position: fixed;
+      inset: 0;
+      background: rgba(0,0,0,0.5);
+      z-index: 100;
+      align-items: center;
+      justify-content: center;
+    }
+    .modal-overlay.open { display: flex; }
+    .modal-box {
+      background: #fff;
+      border-radius: 12px;
+      padding: 1.5rem;
+      min-width: 320px;
+      max-width: 90vw;
+      box-shadow: 0 8px 32px rgba(0,0,0,0.2);
+    }
+    .modal-box h2 { margin: 0 0 1rem 0; font-size: 1.25rem; font-weight: 600; }
+    .modal-box label { display: block; margin-bottom: 0.25rem; font-size: 14px; color: #333; }
+    .modal-box input[type="text"] {
+      width: 100%;
+      padding: 0.5rem;
+      margin-bottom: 1rem;
+      border: 1px solid #ccc;
+      border-radius: 8px;
+      font-size: 14px;
+    }
+    .country-dropdown-wrap {
+      position: relative;
+      margin-bottom: 1rem;
+    }
+    .country-dropdown-trigger {
+      width: 100%;
+      padding: 0.5rem 1.75rem 0.5rem 0.5rem;
+      border: 1px solid #ccc;
+      border-radius: 8px;
+      font-size: 14px;
+      text-align: left;
+      background: #fff;
+      cursor: pointer;
+      appearance: none;
+      -webkit-appearance: none;
+      box-sizing: border-box;
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%23333' d='M6 8L2 4h8z'/%3E%3C/svg%3E");
+      background-repeat: no-repeat;
+      background-position: right 0.5rem center;
+    }
+    .country-dropdown-trigger:focus {
+      outline: 1px solid #333;
+      outline-offset: 0;
+    }
+    .country-dropdown-popup {
+      position: absolute;
+      left: 0;
+      top: 100%;
+      width: 100%;
+      margin-top: 2px;
+      border: 1px solid #ccc;
+      border-radius: 8px;
+      background: #fff;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+      z-index: 10;
+      max-height: 200px;
+      overflow-y: auto;
+      display: none;
+    }
+    .country-dropdown-popup.open {
+      display: block;
+    }
+    .country-option {
+      padding: 0.5rem 0.5rem;
+      font-size: 14px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 0.25rem;
+    }
+    .country-option:hover {
+      background: #f0f0f0;
+    }
+    .country-option-delete {
+      opacity: 0;
+      flex-shrink: 0;
+      width: 20px;
+      height: 20px;
+      padding: 0;
+      border: none;
+      background: #ccc;
+      color: #333;
+      border-radius: 4px;
+      cursor: pointer;
+      font-size: 14px;
+      line-height: 1;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .country-option:hover .country-option-delete {
+      opacity: 1;
+    }
+    .country-option-delete:hover {
+      background: #add8e6;
+      color: #333;
+    }
+    .country-option:first-child { border-radius: 8px 8px 0 0; }
+    .country-option:last-child { border-radius: 0 0 8px 8px; }
+    .modal-box input:focus {
+      outline: 1px solid #333;
+      outline-offset: 0;
+    }
+    .modal-name-wrap {
+      margin-bottom: 1rem;
+    }
+    .modal-country-name-wrap {
+      margin-bottom: 0.35rem;
+    }
+    .modal-country-name-wrap label {
+      display: block;
+      margin-bottom: 0.25rem;
+      font-size: 14px;
+      color: #333;
+    }
+    .modal-country-name-wrap input {
+      width: 100%;
+      padding: 0.5rem;
+      border: 1px solid #ccc;
+      border-radius: 8px;
+      font-size: 14px;
+    }
+    .modal-country-name-wrap input:focus {
+      outline: 1px solid #333;
+      outline-offset: 0;
+    }
+    .modal-custom-dates {
+      display: none;
+      margin-top: 0.5rem;
+      padding: 0.75rem;
+      background: #f5f5f5;
+      border-radius: 8px;
+    }
+    .modal-custom-dates.open { display: block; }
+    .modal-calendar-label { margin: 0 0 0.5rem 0; font-size: 13px; color: #555; }
+    .holiday-calendar { border: 1px solid #ddd; border-radius: 8px; padding: 0.5rem; background: #fff; }
+    .holiday-calendar-nav { display: flex; align-items: center; justify-content: space-between; margin-bottom: 0.5rem; }
+    .holiday-calendar-prev,
+    .holiday-calendar-next { background: #f0f0f0; border: 1px solid #ccc; border-radius: 6px; padding: 0.25rem 0.5rem; cursor: pointer; font-size: 1rem; }
+    .holiday-calendar-prev:hover,
+    .holiday-calendar-next:hover { background: #e0e0e0; }
+    .holiday-calendar-month { font-size: 14px; font-weight: 600; }
+    .holiday-calendar-weekdays { display: grid; grid-template-columns: repeat(7, 1fr); gap: 2px; margin-bottom: 4px; text-align: center; font-size: 11px; color: #666; }
+    .holiday-calendar-days { display: grid; grid-template-columns: repeat(7, 1fr); gap: 2px; }
+    .holiday-cal-day { aspect-ratio: 1; display: flex; align-items: center; justify-content: center; font-size: 13px; border-radius: 6px; cursor: pointer; }
+    .holiday-cal-day.other-month { color: #bbb; }
+    .holiday-cal-day.this-month:hover { background: #e8f4f4; }
+    .holiday-cal-day.selected { background: #09757A; color: #fff; }
+    .holiday-cal-day.selected:hover { background: #076266; }
+    .modal-actions { display: flex; justify-content: flex-end; gap: 0.5rem; margin-top: 1rem; }
+    .modal-actions button { padding: 0.5rem 1rem; border-radius: 8px; font-size: 14px; cursor: pointer; }
+    .modal-done-btn { background: #09757A; color: #fff; border: none; }
+    .modal-done-btn:hover { background: #076266; }
+    .modal-cancel-btn { background: #e0e0e0; color: #333; border: none; }
+    .modal-cancel-btn:hover { background: #d0d0d0; }
+    .wheel-modal-box { min-width: 440px; padding: 2rem; text-align: center; }
+    .wheel-modal-box h2 { font-size: 1.5rem; }
+    .wheel-names-wrap { margin: 1.5rem 0; }
+    .wheel-names-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 0.5rem;
+      max-height: 280px;
+      overflow-y: auto;
+    }
+    .wheel-name-cell {
+      padding: 0.5rem 0.75rem;
+      background: #D8EFEF;
+      color: #09757A;
+      font-size: 14px;
+      font-weight: 600;
+      border-radius: 8px;
+      border: 2px solid transparent;
+      text-align: center;
+      transition: background 0.1s, border-color 0.1s;
+    }
+    .wheel-name-cell.highlight {
+      background: #09757A;
+      color: #fff;
+      border-color: #076266;
+    }
+    .wheel-actions { display: flex; gap: 0.5rem; justify-content: space-between; margin-top: 1rem; flex-wrap: wrap; }
+    .wheel-spin-btn, .wheel-reset-btn {
+      padding: 0.5rem 1rem;
+      border-radius: 8px;
+      font-size: 14px;
+      cursor: pointer;
+      border: none;
+      flex: 1;
+      max-width: 100px;
+    }
+    .wheel-spin-btn { background: #09757A; color: #fff; }
+    .wheel-spin-btn:hover { background: #076266; }
+    .wheel-spin-btn:disabled { opacity: 0.6; cursor: not-allowed; }
+    .wheel-reset-btn { background: #e0e0e0; color: #333; }
+    .wheel-reset-btn:hover { background: #d0d0d0; }
+    .wheel-actions .wheel-selected-name { font-size: 1.25rem; font-weight: 600; color: #333; flex: 1; text-align: center; min-width: 120px; display: flex; align-items: center; justify-content: center; }
+    .wheel-actions { align-items: center; }
   </style>
 </head>
 <body>
@@ -308,7 +544,8 @@
     <div class="left-panel">
       <div class="chart-title-wrap">
         <h1 class="chart-title">Velocity Chart</h1>
-        <img src="plus.svg" alt="" width="20" height="20">
+        <button type="button" class="add-contributor-btn" id="random-btn" aria-label="Random"><img src="random.svg" alt="" width="20" height="20"></button>
+        <button type="button" class="add-contributor-btn" id="add-contributor-btn" aria-label="Add contributor"><img src="plus.svg" alt="" width="20" height="20"></button>
       </div>
       <div class="contributor-section">
         <div class="contributor-header-row">
@@ -344,8 +581,63 @@
       </div>
     </div>
   </div>
+  <div class="modal-overlay" id="add-contributor-modal" aria-hidden="true">
+    <div class="modal-box" role="dialog" aria-labelledby="modal-title">
+      <h2 id="modal-title">Add contributor</h2>
+      <div class="modal-name-wrap" id="modal-name-wrap">
+        <label for="modal-name">Name</label>
+        <input type="text" id="modal-name" placeholder="Name" />
+      </div>
+      <div class="modal-country-name-wrap" id="modal-country-name-wrap" style="display: none;">
+        <label for="modal-country-name">Country name</label>
+        <input type="text" id="modal-country-name" placeholder="Country name" />
+      </div>
+      <label for="modal-country">Country</label>
+      <div class="country-dropdown-wrap">
+        <input type="hidden" id="modal-country" value="us" />
+        <button type="button" class="country-dropdown-trigger" id="modal-country-trigger" aria-haspopup="listbox" aria-expanded="false" aria-label="Country">US</button>
+        <div class="country-dropdown-popup" id="modal-country-popup" role="listbox" aria-hidden="true">
+          <div id="modal-country-options"></div>
+        </div>
+      </div>
+      <div class="modal-custom-dates" id="modal-custom-dates">
+        <p class="modal-calendar-label">Pick default holiday dates</p>
+        <div class="holiday-calendar">
+          <div class="holiday-calendar-nav">
+            <button type="button" class="holiday-calendar-prev" id="holiday-cal-prev" aria-label="Previous month">‹</button>
+            <span class="holiday-calendar-month" id="holiday-cal-month">January 2026</span>
+            <button type="button" class="holiday-calendar-next" id="holiday-cal-next" aria-label="Next month">›</button>
+          </div>
+          <div class="holiday-calendar-weekdays">
+            <span>S</span><span>M</span><span>T</span><span>W</span><span>T</span><span>F</span><span>S</span>
+          </div>
+          <div class="holiday-calendar-days" id="holiday-cal-days"></div>
+        </div>
+      </div>
+      <div class="modal-actions">
+        <button type="button" class="modal-cancel-btn" id="modal-cancel">Cancel</button>
+        <button type="button" class="modal-done-btn" id="modal-done">Done</button>
+      </div>
+    </div>
+  </div>
+  <div class="modal-overlay" id="wheel-modal" aria-hidden="true">
+    <div class="modal-box wheel-modal-box" role="dialog" aria-labelledby="wheel-modal-title">
+      <h2 id="wheel-modal-title">Name Randomizer</h2>
+      <div class="wheel-names-wrap">
+        <div class="wheel-names-grid" id="wheel-names-grid"></div>
+      </div>
+      <div class="wheel-actions">
+        <button type="button" class="wheel-reset-btn" id="wheel-reset">Reset</button>
+        <span class="wheel-selected-name" id="wheel-selected-name" hidden></span>
+        <button type="button" class="wheel-spin-btn" id="wheel-spin">Spin</button>
+      </div>
+    </div>
+  </div>
   <script>
     var STORAGE_KEY = 'velocityChartData';
+    var CUSTOM_COUNTRIES_KEY = 'velocityChartCustomCountries';
+    var REMOVED_PRESETS_KEY = 'velocityChartRemovedPresetCountries';
+    var wheelRemovedRows = [];
     var NUM_COLUMNS = 10;
     var DEFAULT_DATES = ['2/17/26', '2/18/26', '', '', '', '', '', '', '', ''];
     var DEFAULT_ROWS = [
@@ -357,11 +649,46 @@
     // Wellness days: apply to every contributor regardless of country
     var WELLNESS_DAYS = ['2026-03-13', '2026-05-15', '2026-08-14', '2026-10-09'];
 
+    var COUNTRY_HOLIDAYS = {
+      us: ['2026-01-01','2026-01-19','2026-03-13','2026-05-15','2026-05-25','2026-06-19','2026-07-03','2026-08-14','2026-09-07','2026-10-09','2026-11-11','2026-11-26','2026-11-27','2026-12-25'],
+      columbia: ['2026-01-01','2026-01-12','2026-03-13','2026-03-23','2026-04-02','2026-04-03','2026-05-01','2026-05-15','2026-05-18','2026-06-08','2026-06-15','2026-06-29','2026-07-20','2026-08-07','2026-08-14','2026-08-17','2026-10-09','2026-10-12','2026-11-02','2026-11-16','2026-12-08','2026-12-25'],
+      canada: ['2026-01-01','2026-02-16','2026-03-13','2026-04-03','2026-05-15','2026-05-18','2026-07-01','2026-08-03','2026-08-14','2026-09-07','2026-09-30','2026-10-09','2026-10-12','2026-12-25','2026-12-28']
+    };
+
     var HOLIDAYS_BY_PERSON = [
-      { names: ['sayan', 'raul', 'raúl'], dates: ['2026-01-01','2026-01-12','2026-03-13','2026-03-23','2026-04-02','2026-04-03','2026-05-01','2026-05-15','2026-05-18','2026-06-08','2026-06-15','2026-06-29','2026-07-20','2026-08-07','2026-08-14','2026-08-17','2026-10-09','2026-10-12','2026-11-02','2026-11-16','2026-12-08','2026-12-25'] },
-      { names: ['nadia'], dates: ['2026-01-01','2026-02-16','2026-03-13','2026-04-03','2026-05-15','2026-05-18','2026-07-01','2026-08-03','2026-08-14','2026-09-07','2026-09-30','2026-10-09','2026-10-12','2026-12-25','2026-12-28'] },
-      { names: ['shriya', 'eileen', 'arissa', 'grace', 'alexis'], dates: ['2026-01-01','2026-01-19','2026-03-13','2026-05-15','2026-05-25','2026-06-19','2026-07-03','2026-08-14','2026-09-07','2026-10-09','2026-11-11','2026-11-26','2026-11-27','2026-12-25'] }
+      { names: ['sayan', 'raul', 'raúl'], dates: COUNTRY_HOLIDAYS.columbia },
+      { names: ['nadia'], dates: COUNTRY_HOLIDAYS.canada },
+      { names: ['shriya', 'eileen', 'arissa', 'grace', 'alexis'], dates: COUNTRY_HOLIDAYS.us }
     ];
+
+    var customCountriesList = [];
+
+    var removedPresetCountries = [];
+
+    function loadCustomCountries() {
+      try {
+        var raw = localStorage.getItem(CUSTOM_COUNTRIES_KEY);
+        if (raw) customCountriesList = JSON.parse(raw);
+        else customCountriesList = [];
+      } catch (e) { customCountriesList = []; }
+    }
+    function saveCustomCountries() {
+      try {
+        localStorage.setItem(CUSTOM_COUNTRIES_KEY, JSON.stringify(customCountriesList));
+      } catch (e) {}
+    }
+    function loadRemovedPresets() {
+      try {
+        var raw = localStorage.getItem(REMOVED_PRESETS_KEY);
+        if (raw) removedPresetCountries = JSON.parse(raw);
+        else removedPresetCountries = [];
+      } catch (e) { removedPresetCountries = []; }
+    }
+    function saveRemovedPresets() {
+      try {
+        localStorage.setItem(REMOVED_PRESETS_KEY, JSON.stringify(removedPresetCountries));
+      } catch (e) {}
+    }
 
     function gridDateToISO(dateStr) {
       if (!dateStr || !/^\d{1,2}\/\d{1,2}\/\d{2}$/.test(dateStr)) return '';
@@ -392,11 +719,34 @@
       return holidays.indexOf(iso) !== -1;
     }
 
+    function getCustomCountryDates(id) {
+      if (!id || id.indexOf('custom:') !== 0) return [];
+      var name = id.replace(/^custom:/, '');
+      for (var i = 0; i < customCountriesList.length; i++)
+        if (customCountriesList[i].name === name) return customCountriesList[i].dates;
+      return [];
+    }
+
+    function getHolidayDatesForRow(rec) {
+      if (rec.customHolidays && rec.customHolidays.length) return rec.customHolidays;
+      if (rec.holidayCountry && rec.holidayCountry.indexOf('custom:') === 0) return getCustomCountryDates(rec.holidayCountry);
+      if (rec.holidayCountry && COUNTRY_HOLIDAYS[rec.holidayCountry]) return COUNTRY_HOLIDAYS[rec.holidayCountry];
+      return getHolidayDatesForName(rec.name);
+    }
+
+    function isHolidayForRow(dateStr, rec) {
+      var iso = gridDateToISO(dateStr);
+      if (!iso) return false;
+      if (WELLNESS_DAYS.indexOf(iso) !== -1) return true;
+      var holidays = getHolidayDatesForRow(rec);
+      return holidays.indexOf(iso) !== -1;
+    }
+
     function getSprintStartTuesday(d) {
       var date = new Date(d.getFullYear(), d.getMonth(), d.getDate());
       var day = date.getDay();
-      var daysUntilTuesday = (2 - day + 7) % 7;
-      date.setDate(date.getDate() + daysUntilTuesday);
+      var daysBackToTuesday = (day - 2 + 7) % 7;
+      date.setDate(date.getDate() - daysBackToTuesday);
       return date;
     }
 
@@ -416,12 +766,25 @@
       return month + '/' + day + '/' + year;
     }
 
-    var SPRINT_CALENDAR_DAYS = 14;
+    function addWorkDays(d, n) {
+      var result = new Date(d.getFullYear(), d.getMonth(), d.getDate());
+      while (n > 0) {
+        result = getNextWorkDay(result);
+        n--;
+      }
+      return result;
+    }
+
+    var sprintAnchorDate = null;
 
     function getSprintDatesForOffset(offset) {
-      var baseStart = getSprintStartTuesday(new Date());
-      var start = new Date(baseStart.getFullYear(), baseStart.getMonth(), baseStart.getDate());
-      start.setDate(start.getDate() + offset * SPRINT_CALENDAR_DAYS);
+      if (sprintAnchorDate == null) {
+        sprintAnchorDate = getSprintStartTuesday(new Date());
+      }
+      var baseStart = sprintAnchorDate;
+      var start = offset === 0
+        ? new Date(baseStart.getFullYear(), baseStart.getMonth(), baseStart.getDate())
+        : addWorkDays(baseStart, offset * NUM_COLUMNS);
       var dates = [];
       var d = new Date(start.getFullYear(), start.getMonth(), start.getDate());
       for (var i = 0; i < NUM_COLUMNS; i++) {
@@ -468,15 +831,17 @@
       var gridRows = document.querySelectorAll('#grid-body tr');
       var rowContainers = document.querySelectorAll('#contributor-rows .contributor-row');
       for (var r = 0; r < gridRows.length; r++) {
-        var name = '';
+        var rec = { name: '' };
         if (rowContainers[r]) {
           var nameEl = rowContainers[r].querySelector('.contributor-input');
-          if (nameEl) name = nameEl.value.trim();
+          if (nameEl) rec.name = nameEl.value.trim();
+          rec.holidayCountry = rowContainers[r].dataset.holidayCountry || '';
+          try { rec.customHolidays = JSON.parse(rowContainers[r].dataset.customHolidays || '[]'); } catch (e) { rec.customHolidays = []; }
         }
         var cells = gridRows[r].querySelectorAll('td');
         for (var c = 0; c < cells.length && c < dates.length; c++) {
           var dateStr = dates[c];
-          var isHoliday = isHolidayForPerson(dateStr, name);
+          var isHoliday = isHolidayForRow(dateStr, rec);
           var td = cells[c];
           if (isHoliday) {
             td.textContent = '\u{1F334}';
@@ -545,12 +910,20 @@
             pointSpecials.push(cells[c].classList.contains('special'));
           }
         }
+        var rowDiv = rowContainers[r];
+        var holidayCountry = (rowDiv && rowDiv.dataset.holidayCountry) ? rowDiv.dataset.holidayCountry : '';
+        var customHolidays = [];
+        if (rowDiv && rowDiv.dataset.customHolidays) {
+          try { customHolidays = JSON.parse(rowDiv.dataset.customHolidays); } catch (e) {}
+        }
         data.rows.push({
           name: nameEl ? nameEl.value.trim() : '',
           low: lowEl ? lowEl.value.trim() : '',
           high: highEl ? highEl.value.trim() : '',
           points: points,
-          pointSpecials: pointSpecials
+          pointSpecials: pointSpecials,
+          holidayCountry: holidayCountry || undefined,
+          customHolidays: customHolidays.length ? customHolidays : undefined
         });
       }
       return data;
@@ -561,8 +934,6 @@
         localStorage.setItem(STORAGE_KEY, JSON.stringify(getChartData()));
       } catch (e) {}
     }
-
-    var HIGH_MULTIPLIER = 0.8;
 
     function updateLowFromPoints() {
       var multiplier = parseFloat(document.getElementById('multiplier-input').value, 10) || 0.6;
@@ -576,7 +947,7 @@
           if (!isNaN(val)) sum += val;
         }
         var low = Math.round(sum * multiplier);
-        var high = Math.round(sum * HIGH_MULTIPLIER);
+        var high = Math.round(sum * (multiplier + 0.2));
         if (rowContainers[r]) {
           var lowEl = rowContainers[r].querySelector('.low-high-input.low');
           var highEl = rowContainers[r].querySelector('.low-high-input.high');
@@ -586,6 +957,18 @@
       }
     }
 
+    function parseDateString(str) {
+      if (!str || typeof str !== 'string') return null;
+      var parts = str.trim().split('/');
+      if (parts.length !== 3) return null;
+      var month = parseInt(parts[0], 10);
+      var day = parseInt(parts[1], 10);
+      var year = parseInt(parts[2], 10);
+      if (year < 100) year += 2000;
+      if (month < 1 || month > 12 || day < 1 || day > 31) return null;
+      return new Date(year, month - 1, day);
+    }
+
     function render(data) {
       var r, c, row, cell, tr, td;
       var rowsContainer = document.getElementById('contributor-rows');
@@ -593,6 +976,20 @@
       var gridBody = document.getElementById('grid-body');
       var monthHeader = document.getElementById('month-header');
 
+      var preserved = null;
+      if (data.dates && data.dates.length > 0 && data.dates[0]) {
+        preserved = parseDateString(data.dates[0]);
+      }
+      if (!preserved) {
+        var firstTh = document.querySelector('#dates-row th');
+        if (firstTh && firstTh.textContent.trim()) {
+          preserved = parseDateString(firstTh.textContent.trim());
+        }
+      }
+      if (preserved) {
+        sprintAnchorDate = preserved;
+      }
+      sprintOffset = 0;
       var dates = getSprintDates();
       monthHeader.textContent = getSprintMonthLabel();
       datesRow.innerHTML = '';
@@ -613,10 +1010,13 @@
         var rec = rows[r] || { name: '', low: '', high: '', points: [], pointSpecials: [] };
         row = document.createElement('div');
         row.className = 'contributor-row';
+        row.draggable = true;
+        row.dataset.holidayCountry = rec.holidayCountry || '';
+        row.dataset.customHolidays = JSON.stringify(rec.customHolidays || []);
         row.innerHTML =
           '<input type="text" class="contributor-input" placeholder="Name" value="' + escapeHtml(rec.name) + '" data-row="' + r + '" />' +
           '<input type="text" class="low-high-input low" placeholder="—" value="' + escapeHtml(rec.low) + '" data-row="' + r + '" />' +
-          '<input type="text" class="low-high-input high" placeholder="—" value="' + escapeHtml(rec.high) + '" data-row="' + r + '" />';
+          '<input type="text" class="low-high-input high" placeholder="—" value="' + escapeHtml(rec.high) + '" data-row="' + r + '" readonly />';
         rowsContainer.appendChild(row);
 
         tr = document.createElement('tr');
@@ -627,7 +1027,7 @@
         for (c = 0; c < NUM_COLUMNS; c++) {
           td = document.createElement('td');
           var dateStr = dates[c];
-          var isHoliday = isHolidayForPerson(dateStr, rec.name);
+          var isHoliday = isHolidayForRow(dateStr, rec);
           var pt;
           if (isHoliday) {
             pt = '\u{1F334}';
@@ -661,12 +1061,72 @@
         updateLowFromPoints();
         saveChartData();
       }
-      document.querySelectorAll('.contributor-input, .low-high-input').forEach(function(el) {
+      document.querySelectorAll('.contributor-input, .low-high-input.low').forEach(function(el) {
         el.addEventListener('input', onEdit);
         el.addEventListener('change', onEdit);
       });
+      document.querySelectorAll('.contributor-input').forEach(function(input) {
+        input.addEventListener('blur', function() {
+          if (this.value.trim().toLowerCase() !== 'delete') return;
+          var rowIndex = parseInt(this.dataset.row, 10);
+          if (isNaN(rowIndex)) return;
+          var data = getChartData();
+          if (data.rows.length <= 1) return;
+          data.rows.splice(rowIndex, 1);
+          try {
+            var toSave = { month: data.month, dates: data.dates, rows: data.rows, multiplier: data.multiplier };
+            localStorage.setItem(STORAGE_KEY, JSON.stringify(toSave));
+          } catch (e) {}
+          location.reload();
+        });
+      });
       document.getElementById('multiplier-input').addEventListener('input', onPointsOrMultiplierEdit);
       document.getElementById('multiplier-input').addEventListener('change', onPointsOrMultiplierEdit);
+
+      var rowsContainer = document.getElementById('contributor-rows');
+      var gridBody = document.getElementById('grid-body');
+      rowsContainer.addEventListener('dragstart', function(ev) {
+        var row = ev.target.closest('.contributor-row');
+        if (!row) return;
+        var rows = rowsContainer.querySelectorAll('.contributor-row');
+        var idx = Array.prototype.indexOf.call(rows, row);
+        ev.dataTransfer.setData('text/plain', String(idx));
+        ev.dataTransfer.effectAllowed = 'move';
+      });
+      rowsContainer.addEventListener('dragover', function(ev) {
+        ev.preventDefault();
+        ev.dataTransfer.dropEffect = 'move';
+      });
+      rowsContainer.addEventListener('drop', function(ev) {
+        ev.preventDefault();
+        var dragIndex = parseInt(ev.dataTransfer.getData('text/plain'), 10);
+        if (isNaN(dragIndex)) return;
+        var dropRow = ev.target.closest('.contributor-row');
+        if (!dropRow) return;
+        var rows = rowsContainer.querySelectorAll('.contributor-row');
+        var dropIndex = Array.prototype.indexOf.call(rows, dropRow);
+        if (dragIndex === dropIndex) return;
+        var contribRows = rowsContainer.querySelectorAll('.contributor-row');
+        var gridRows = gridBody.querySelectorAll('tr');
+        var draggedContrib = contribRows[dragIndex];
+        var draggedGrid = gridRows[dragIndex];
+        draggedContrib.remove();
+        draggedGrid.remove();
+        var afterContrib = rowsContainer.querySelectorAll('.contributor-row');
+        var afterGrid = gridBody.querySelectorAll('tr');
+        var insertRefContrib = afterContrib[dropIndex] || null;
+        var insertRefGrid = afterGrid[dropIndex] || null;
+        rowsContainer.insertBefore(draggedContrib, insertRefContrib);
+        gridBody.insertBefore(draggedGrid, insertRefGrid);
+        rowsContainer.querySelectorAll('.contributor-row').forEach(function(r, i) {
+          r.querySelectorAll('.contributor-input, .low-high-input').forEach(function(inp) { inp.dataset.row = i; });
+        });
+        gridBody.querySelectorAll('tr').forEach(function(tr, i) {
+          tr.querySelectorAll('td').forEach(function(td) { td.dataset.row = i; });
+        });
+        saveChartData();
+      });
+
       document.querySelectorAll('#grid-body td').forEach(function(td) {
         td.addEventListener('click', function(e) {
           if (this.classList.contains('island')) {
@@ -695,12 +1155,433 @@
         updateSprintDisplay();
       });
       document.getElementById('sprint-today').addEventListener('click', function() {
+        sprintAnchorDate = getSprintStartTuesday(new Date());
         sprintOffset = 0;
         updateSprintDisplay();
       });
     }
 
+    function openAddContributorModal() {
+      var modal = document.getElementById('add-contributor-modal');
+      var nameEl = document.getElementById('modal-name');
+      var countryEl = document.getElementById('modal-country');
+      var trigger = document.getElementById('modal-country-trigger');
+      var popup = document.getElementById('modal-country-popup');
+      var customDatesEl = document.getElementById('modal-custom-dates');
+      nameEl.value = '';
+      countryEl.value = 'us';
+      if (trigger) trigger.textContent = 'US';
+      if (popup) popup.classList.remove('open');
+      if (popup) popup.setAttribute('aria-hidden', 'true');
+      if (trigger) trigger.setAttribute('aria-expanded', 'false');
+      var titleEl = document.getElementById('modal-title');
+      var nameWrap = document.getElementById('modal-name-wrap');
+      var countryNameWrap = document.getElementById('modal-country-name-wrap');
+      var countryNameInput = document.getElementById('modal-country-name');
+      if (titleEl) titleEl.textContent = 'Add contributor';
+      if (nameWrap) nameWrap.style.display = 'block';
+      if (countryNameWrap) countryNameWrap.style.display = 'none';
+      if (countryNameInput) countryNameInput.value = '';
+      modalHolidaySelectedDates = [];
+      holidayCalYear = 2026;
+      holidayCalMonth = 0;
+      customDatesEl.classList.remove('open');
+      modal.classList.add('open');
+      modal.setAttribute('aria-hidden', 'false');
+      nameEl.focus();
+    }
+
+    var modalHolidaySelectedDates = [];
+
+    function toISO(y, m, d) {
+      m = m + 1;
+      return y + '-' + (m < 10 ? '0' : '') + m + '-' + (d < 10 ? '0' : '') + d;
+    }
+
+    function renderHolidayCalendar(year, month) {
+      var container = document.getElementById('holiday-cal-days');
+      var monthLabel = document.getElementById('holiday-cal-month');
+      if (!container || !monthLabel) return;
+      var monthNames = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
+      monthLabel.textContent = monthNames[month] + ' ' + year;
+      var first = new Date(year, month, 1);
+      var last = new Date(year, month + 1, 0);
+      var startDay = first.getDay();
+      var daysInMonth = last.getDate();
+      var prevMonth = month === 0 ? 11 : month - 1;
+      var prevYear = month === 0 ? year - 1 : year;
+      var prevLast = new Date(prevYear, prevMonth + 1, 0);
+      var daysPrev = prevLast.getDate();
+      container.innerHTML = '';
+      var i, d, iso, cell;
+      for (i = 0; i < startDay; i++) {
+        d = daysPrev - startDay + i + 1;
+        cell = document.createElement('div');
+        cell.className = 'holiday-cal-day other-month';
+        cell.textContent = d;
+        cell.dataset.date = toISO(prevYear, prevMonth, d);
+        container.appendChild(cell);
+      }
+      for (d = 1; d <= daysInMonth; d++) {
+        iso = toISO(year, month, d);
+        cell = document.createElement('div');
+        cell.className = 'holiday-cal-day this-month' + (modalHolidaySelectedDates.indexOf(iso) !== -1 ? ' selected' : '');
+        cell.textContent = d;
+        cell.dataset.date = iso;
+        container.appendChild(cell);
+      }
+      var total = startDay + daysInMonth;
+      var nextD = 1;
+      while (total % 7 !== 0) {
+        cell = document.createElement('div');
+        cell.className = 'holiday-cal-day other-month';
+        cell.textContent = nextD;
+        cell.dataset.date = toISO(month === 11 ? year + 1 : year, month === 11 ? 0 : month + 1, nextD);
+        container.appendChild(cell);
+        nextD++;
+        total++;
+      }
+      container.querySelectorAll('.holiday-cal-day').forEach(function(el) {
+        el.addEventListener('click', function() {
+          var date = this.dataset.date;
+          if (!date) return;
+          var idx = modalHolidaySelectedDates.indexOf(date);
+          if (idx !== -1) {
+            modalHolidaySelectedDates.splice(idx, 1);
+          } else {
+            modalHolidaySelectedDates.push(date);
+          }
+          modalHolidaySelectedDates.sort();
+          renderHolidayCalendar(holidayCalYear, holidayCalMonth);
+        });
+      });
+    }
+
+    var holidayCalYear = 2026;
+    var holidayCalMonth = 0;
+
+    function getModalCustomHolidays() {
+      return modalHolidaySelectedDates.slice();
+    }
+
+    function getWheelRows() {
+      var data = getChartData();
+      var rows = data.rows || [];
+      return rows.filter(function(r) {
+        var name = (r.name || '').trim();
+        return !wheelRemovedRows.some(function(w) { return (w.name || '').trim() === name; });
+      });
+    }
+
+    function buildWheelNames() {
+      var rows = getWheelRows();
+      var names = [];
+      for (var i = 0; i < rows.length; i++) {
+        var n = (rows[i].name || '').trim();
+        names.push(n || '—');
+      }
+      if (names.length === 0) names.push('Add contributors');
+      var grid = document.getElementById('wheel-names-grid');
+      grid.innerHTML = '';
+      for (var i = 0; i < names.length; i++) {
+        var cell = document.createElement('div');
+        cell.className = 'wheel-name-cell';
+        cell.dataset.index = String(i);
+        cell.textContent = names[i];
+        grid.appendChild(cell);
+      }
+      window._wheelRows = rows;
+    }
+
+    function setupWheelModal() {
+      var modal = document.getElementById('wheel-modal');
+      var spinBtn = document.getElementById('wheel-spin');
+      var resetBtn = document.getElementById('wheel-reset');
+      var grid = document.getElementById('wheel-names-grid');
+      var selectedNameEl = document.getElementById('wheel-selected-name');
+      var randomBtn = document.getElementById('random-btn');
+
+      function revertButtons() {
+        resetBtn.textContent = 'Reset';
+        spinBtn.textContent = 'Spin';
+        selectedNameEl.hidden = true;
+        selectedNameEl.textContent = '';
+        window._wheelWinnerRow = null;
+      }
+
+      randomBtn.addEventListener('click', function() {
+        buildWheelNames();
+        modal.classList.add('open');
+        modal.setAttribute('aria-hidden', 'false');
+        revertButtons();
+      });
+
+      spinBtn.addEventListener('click', function() {
+        if (spinBtn.textContent === 'OK') {
+          if (window._wheelWinnerRow) {
+            wheelRemovedRows.push(window._wheelWinnerRow);
+            window._wheelWinnerRow = null;
+          }
+          revertButtons();
+          buildWheelNames();
+          return;
+        }
+        var rows = window._wheelRows || getWheelRows();
+        if (rows.length === 0) return;
+        var cells = grid.querySelectorAll('.wheel-name-cell');
+        if (cells.length === 0 || cells.length !== rows.length) return;
+        var n = rows.length;
+        var winnerIndex = Math.floor(Math.random() * n);
+        spinBtn.disabled = true;
+        var currentIdx = 0;
+        var step = 0;
+        var totalSteps = 2 * n + winnerIndex + 1;
+        var baseDelay = 60;
+        var maxDelay = 220;
+        function tick() {
+          cells.forEach(function(c) { c.classList.remove('highlight'); });
+          cells[currentIdx].classList.add('highlight');
+          step++;
+          if (step >= totalSteps) {
+            spinBtn.disabled = false;
+            var winnerRow = rows[winnerIndex];
+            var name = (winnerRow.name || '').trim() || '—';
+            selectedNameEl.textContent = name;
+            selectedNameEl.hidden = false;
+            resetBtn.textContent = 'Respin';
+            spinBtn.textContent = 'OK';
+            window._wheelWinnerRow = winnerRow;
+            return;
+          }
+          currentIdx = (currentIdx + 1) % n;
+          var delay = Math.min(baseDelay + step * 8, maxDelay);
+          setTimeout(tick, delay);
+        }
+        tick();
+      });
+
+      resetBtn.addEventListener('click', function() {
+        if (resetBtn.textContent === 'Respin') {
+          revertButtons();
+          spinBtn.click();
+          return;
+        }
+        wheelRemovedRows = [];
+        buildWheelNames();
+      });
+
+      modal.addEventListener('click', function(e) {
+        if (e.target === modal) {
+          modal.classList.remove('open');
+          modal.setAttribute('aria-hidden', 'true');
+        }
+      });
+    }
+
+    function setupAddContributorModal() {
+      var modal = document.getElementById('add-contributor-modal');
+      var btn = document.getElementById('add-contributor-btn');
+      var countryEl = document.getElementById('modal-country');
+      var trigger = document.getElementById('modal-country-trigger');
+      var popup = document.getElementById('modal-country-popup');
+      var customDatesEl = document.getElementById('modal-custom-dates');
+      var cancelBtn = document.getElementById('modal-cancel');
+      var doneBtn = document.getElementById('modal-done');
+
+      btn.addEventListener('click', openAddContributorModal);
+
+      function onCountryChange() {
+        var titleEl = document.getElementById('modal-title');
+        var nameWrap = document.getElementById('modal-name-wrap');
+        var countryNameWrap = document.getElementById('modal-country-name-wrap');
+        if (countryEl.value === 'new') {
+          if (titleEl) titleEl.textContent = 'Add country';
+          if (nameWrap) nameWrap.style.display = 'none';
+          if (countryNameWrap) countryNameWrap.style.display = 'block';
+          customDatesEl.classList.add('open');
+          modalHolidaySelectedDates = WELLNESS_DAYS.slice();
+          renderHolidayCalendar(holidayCalYear, holidayCalMonth);
+        } else {
+          if (titleEl) titleEl.textContent = 'Add contributor';
+          if (nameWrap) nameWrap.style.display = 'block';
+          if (countryNameWrap) countryNameWrap.style.display = 'none';
+          customDatesEl.classList.remove('open');
+        }
+      }
+
+      var PRESET_COUNTRIES = [
+        { value: 'us', label: 'US' },
+        { value: 'columbia', label: 'Columbia' },
+        { value: 'canada', label: 'Canada (Ontario)' }
+      ];
+
+      function makeCountryOption(label, value, withDelete, onDelete) {
+        var opt = document.createElement('div');
+        opt.className = 'country-option';
+        opt.setAttribute('data-value', value);
+        opt.setAttribute('role', 'option');
+        var span = document.createElement('span');
+        span.className = 'country-option-label';
+        span.textContent = label;
+        opt.appendChild(span);
+        if (withDelete) {
+          var delBtn = document.createElement('button');
+          delBtn.type = 'button';
+          delBtn.className = 'country-option-delete';
+          delBtn.setAttribute('aria-label', 'Remove country');
+          delBtn.textContent = '×';
+          delBtn.addEventListener('click', function(e) {
+            e.stopPropagation();
+            if (onDelete) onDelete();
+            renderAllCountryOptions();
+          });
+          opt.appendChild(delBtn);
+        }
+        return opt;
+      }
+
+      function renderAllCountryOptions() {
+        var container = document.getElementById('modal-country-options');
+        if (!container) return;
+        container.innerHTML = '';
+        var i, c, opt;
+        for (i = 0; i < PRESET_COUNTRIES.length; i++) {
+          c = PRESET_COUNTRIES[i];
+          if (removedPresetCountries.indexOf(c.value) !== -1) continue;
+          opt = makeCountryOption(c.label, c.value, true, function(val) {
+            return function() {
+              removedPresetCountries.push(val);
+              saveRemovedPresets();
+              if (countryEl.value === val) {
+                countryEl.value = 'new';
+                trigger.textContent = '+ New';
+                onCountryChange();
+              }
+            };
+          }(c.value));
+          container.appendChild(opt);
+        }
+        customCountriesList.forEach(function(c) {
+          opt = makeCountryOption(c.name, 'custom:' + c.name, true, function(name) {
+            return function() {
+              for (var j = 0; j < customCountriesList.length; j++) {
+                if (customCountriesList[j].name === name) {
+                  customCountriesList.splice(j, 1);
+                  break;
+                }
+              }
+              saveCustomCountries();
+              if (countryEl.value === 'custom:' + name) {
+                countryEl.value = 'new';
+                trigger.textContent = '+ New';
+                onCountryChange();
+              }
+            };
+          }(c.name));
+          container.appendChild(opt);
+        });
+        opt = makeCountryOption('+ New', 'new', false);
+        container.appendChild(opt);
+      }
+
+      if (trigger && popup) {
+        trigger.addEventListener('click', function() {
+          var isOpen = popup.classList.toggle('open');
+          trigger.setAttribute('aria-expanded', isOpen);
+          popup.setAttribute('aria-hidden', !isOpen);
+        });
+        popup.addEventListener('click', function(e) {
+          if (e.target.closest('.country-option-delete')) return;
+          var opt = e.target.closest('.country-option');
+          if (!opt) return;
+          var val = opt.getAttribute('data-value');
+          var labelEl = opt.querySelector('.country-option-label');
+          var label = labelEl ? labelEl.textContent.trim() : opt.textContent.trim();
+          countryEl.value = val;
+          trigger.textContent = label;
+          popup.classList.remove('open');
+          trigger.setAttribute('aria-expanded', 'false');
+          popup.setAttribute('aria-hidden', 'true');
+          onCountryChange();
+        });
+        document.addEventListener('click', function(e) {
+          if (popup.classList.contains('open') && !popup.contains(e.target) && e.target !== trigger) {
+            popup.classList.remove('open');
+            trigger.setAttribute('aria-expanded', 'false');
+            popup.setAttribute('aria-hidden', 'true');
+          }
+        });
+      }
+      countryEl.addEventListener('change', onCountryChange);
+
+      document.getElementById('holiday-cal-prev').addEventListener('click', function() {
+        holidayCalMonth--;
+        if (holidayCalMonth < 0) { holidayCalMonth = 11; holidayCalYear--; }
+        renderHolidayCalendar(holidayCalYear, holidayCalMonth);
+      });
+      document.getElementById('holiday-cal-next').addEventListener('click', function() {
+        holidayCalMonth++;
+        if (holidayCalMonth > 11) { holidayCalMonth = 0; holidayCalYear++; }
+        renderHolidayCalendar(holidayCalYear, holidayCalMonth);
+      });
+
+      function closeModal() {
+        modal.classList.remove('open');
+        modal.setAttribute('aria-hidden', 'true');
+      }
+
+      cancelBtn.addEventListener('click', closeModal);
+      modal.addEventListener('click', function(e) {
+        if (e.target === modal) closeModal();
+      });
+
+      doneBtn.addEventListener('click', function() {
+        var country = document.getElementById('modal-country').value;
+
+        if (country === 'new') {
+          var countryNameInput = document.getElementById('modal-country-name');
+          var countryName = countryNameInput ? countryNameInput.value.trim() : '';
+          var customHolidays = getModalCustomHolidays();
+          if (!countryName) return;
+          customCountriesList.push({ name: countryName, dates: customHolidays.slice() });
+          saveCustomCountries();
+          renderAllCountryOptions();
+          closeModal();
+          return;
+        }
+
+        var nameInput = document.getElementById('modal-name');
+        var name = nameInput ? nameInput.value.trim() : '';
+        var newRow = {
+          name: name,
+          low: '',
+          high: '',
+          points: [],
+          pointSpecials: []
+        };
+        for (var i = 0; i < NUM_COLUMNS; i++) {
+          newRow.points.push('');
+          newRow.pointSpecials.push(false);
+        }
+        var holidayCountry = country || undefined;
+        if (holidayCountry) newRow.holidayCountry = holidayCountry;
+
+        var data = getChartData();
+        data.rows.push(newRow);
+        try {
+          var toSave = { month: data.month, dates: data.dates, rows: data.rows, multiplier: data.multiplier };
+          localStorage.setItem(STORAGE_KEY, JSON.stringify(toSave));
+        } catch (e) {}
+        closeModal();
+        location.reload();
+      });
+
+      renderAllCountryOptions();
+    }
+
     document.addEventListener('DOMContentLoaded', function() {
+      loadCustomCountries();
+      loadRemovedPresets();
       var data = getStoredOrDefault();
       if (data.rows && data.rows.length > 3) {
         while (data.rows.length > 0 && !data.rows[data.rows.length - 1].name && data.rows.length > 3)
@@ -708,6 +1589,8 @@
       }
       render(data);
       attachListeners();
+      setupAddContributorModal();
+      setupWheelModal();
     });
   </script>
 </body>
