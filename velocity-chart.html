@@ -18,6 +18,12 @@
       align-items: center;
       justify-content: center;
     }
+    .page-wrap {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      width: 100%;
+    }
     .chart-wrapper {
       display: flex;
       max-width: 1100px;
@@ -66,6 +72,28 @@
       gap: 6.5px;
       margin-top: calc(-0.1rem - 2px);
     }
+    .reset-data-wrap {
+      margin: 0.5rem 0 0;
+      padding: 0;
+      text-align: right;
+      width: 100%;
+      max-width: 1100px;
+    }
+    .reset-data-sep {
+      color: #999;
+      margin: 0 0.25rem;
+    }
+    .reset-data-link {
+      background: none;
+      border: none;
+      color: #666;
+      font-size: 12px;
+      cursor: pointer;
+      text-decoration: underline;
+      padding: 0.25rem 0;
+    }
+    .reset-data-link:hover { color: #333; }
+    .reset-data-link:focus { outline: none; }
     #contributor-rows {
       display: flex;
       flex-direction: column;
@@ -102,6 +130,43 @@
       align-items: center;
       justify-content: center;
     }
+    .contributor-name-wrap {
+      position: relative;
+      flex: 1;
+      min-width: 0;
+      max-width: 140px;
+    }
+    .contributor-name-wrap .contributor-input {
+      padding-right: 28px;
+    }
+    .contributor-row-delete {
+      position: absolute;
+      right: 4px;
+      top: 50%;
+      transform: translateY(-50%);
+      width: 22px;
+      height: 22px;
+      padding: 0;
+      border: none;
+      border-radius: 6px;
+      background: rgba(255,255,255,0.2);
+      color: #fff;
+      font-size: 16px;
+      line-height: 1;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      opacity: 0;
+    }
+    .contributor-name-wrap:hover .contributor-row-delete {
+      opacity: 1;
+    }
+    .contributor-row-delete:hover {
+      background: rgba(255,255,255,0.35);
+    }
+    .contributor-row-delete:focus { outline: none; }
+    .contributor-row-delete { z-index: 2; }
     .contributor-row {
       display: flex;
       gap: 6.5px;
@@ -540,12 +605,13 @@
   </style>
 </head>
 <body>
+  <div class="page-wrap">
   <div class="chart-wrapper" id="chart-wrapper">
     <div class="left-panel">
       <div class="chart-title-wrap">
         <h1 class="chart-title">Velocity Chart</h1>
-        <button type="button" class="add-contributor-btn" id="random-btn" aria-label="Random"><img src="random.svg" alt="" width="20" height="20"></button>
-        <button type="button" class="add-contributor-btn" id="add-contributor-btn" aria-label="Add contributor"><img src="plus.svg" alt="" width="20" height="20"></button>
+        <button type="button" class="add-contributor-btn" id="random-btn" aria-label="Random"><img src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='24' height='24' viewBox='0 0 24 24' fill='none'%3E%3Cpath d='M21.5308 17.449L19.5308 15.449C19.3901 15.3083 19.1994 15.2293 19.0005 15.2293C18.8016 15.2293 18.6108 15.3083 18.4702 15.449C18.3296 15.5896 18.2506 15.7804 18.2506 15.9793C18.2506 16.1781 18.3296 16.3689 18.4702 16.5095L19.1899 17.2293H15.6704C15.4552 17.2285 15.2438 17.1725 15.0564 17.0666C14.869 16.9608 14.7119 16.8087 14.6001 16.6248L13.6108 14.9871C13.5078 14.8173 13.3416 14.6953 13.1488 14.648C12.9559 14.6006 12.7521 14.6316 12.5821 14.7343C12.4121 14.837 12.2898 15.0029 12.242 15.1957C12.1942 15.3884 12.2248 15.5923 12.3271 15.7625L13.3169 17.4002C13.5625 17.8047 13.9079 18.1394 14.3201 18.3721C14.7322 18.6048 15.1971 18.7278 15.6704 18.7293H19.1899L18.4702 19.449C18.3309 19.5883 18.2506 19.7823 18.2506 19.9793C18.2506 20.1762 18.3309 20.3703 18.4702 20.5095C18.6095 20.6488 18.8035 20.7292 19.0005 20.7292C19.1974 20.7292 19.3915 20.6488 19.5308 20.5095L21.5308 18.5095C21.6737 18.3656 21.7456 18.1725 21.7457 17.9793C21.7458 17.7865 21.6744 17.5935 21.5308 17.449Z' fill='%23111111'/%3E%3Cpath d='M15.8091 6.77076H19.1899L18.4702 7.49049C18.3298 7.62952 18.2485 7.82394 18.248 8.0215C18.2476 8.21906 18.328 8.41386 18.4677 8.55356C18.6074 8.69325 18.8022 8.77367 18.9998 8.77319C19.1973 8.77272 19.3917 8.69137 19.5308 8.55101L21.5308 6.55101C21.6707 6.41002 21.7493 6.21941 21.7493 6.02073C21.7493 5.82206 21.6707 5.63145 21.5308 5.49046L19.5308 3.49046C19.3901 3.34982 19.1994 3.27081 19.0005 3.27081C18.8016 3.27081 18.6108 3.34982 18.4702 3.49046C18.3296 3.6311 18.2506 3.82184 18.2506 4.02073C18.2506 4.21963 18.3296 4.41037 18.4702 4.55101L19.1899 5.27073H15.8091C15.3357 5.27194 14.8706 5.39471 14.4584 5.62727C14.0461 5.85983 13.7005 6.19438 13.4546 6.59886L7.40039 16.6248C7.28873 16.8087 7.13172 16.9609 6.9444 17.0667C6.75708 17.1725 6.54572 17.2285 6.33057 17.2293H3.00049C2.80158 17.2293 2.61081 17.3083 2.47016 17.4489C2.32951 17.5896 2.25049 17.7803 2.25049 17.9793C2.25049 18.1782 2.32951 18.3689 2.47016 18.5096C2.61081 18.6502 2.80158 18.7293 3.00049 18.7293H6.33057C6.80389 18.7277 7.26889 18.6047 7.68105 18.372C8.09322 18.1393 8.43875 17.8046 8.68457 17.4002L14.7378 7.37428C14.8499 7.19054 15.0073 7.03859 15.1948 6.93294C15.3823 6.82729 15.5938 6.77145 15.8091 6.77076Z' fill='%23111111'/%3E%3Cpath d='M3.00049 6.77076H6.19238C6.40744 6.77141 6.61874 6.82724 6.80605 6.9329C6.99337 7.03857 7.15043 7.19055 7.26221 7.37428L8.25146 9.01246C8.35304 9.18159 8.52224 9.30668 8.71372 9.35421C8.9052 9.40175 9.11325 9.37032 9.28214 9.26835C9.45103 9.16637 9.57573 8.99688 9.62282 8.80529C9.66992 8.61371 9.63801 8.40572 9.53564 8.23707L8.54639 6.59889C8.30044 6.19459 7.95486 5.86017 7.54271 5.62763C7.13055 5.39509 6.66562 5.27222 6.19239 5.27076H3.00049C2.80158 5.27076 2.61081 5.34978 2.47016 5.49043C2.32951 5.63108 2.25049 5.82185 2.25049 6.02076C2.25049 6.21967 2.32951 6.41044 2.47016 6.55109C2.61081 6.69174 2.80158 6.77076 3.00049 6.77076Z' fill='%23111111'/%3E%3C/svg%3E" alt="" width="20" height="20"></button>
+        <button type="button" class="add-contributor-btn" id="add-contributor-btn" aria-label="Add contributor"><img src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='24' height='24' viewBox='0 0 24 24' fill='none' stroke='%23fff' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cline x1='12' y1='5' x2='12' y2='19'/%3E%3Cline x1='5' y1='12' x2='19' y2='12'/%3E%3C/svg%3E" alt="" width="20" height="20"></button>
       </div>
       <div class="contributor-section">
         <div class="contributor-header-row">
@@ -560,7 +626,7 @@
       <div class="right-panel">
         <div class="top-bar">
           <div class="month-nav">
-            <button type="button" class="sprint-nav-btn sprint-nav-calendar" id="sprint-today" aria-label="Go to current sprint"><img src="calendar.svg" alt="" width="20" height="20"></button>
+            <button type="button" class="sprint-nav-btn sprint-nav-calendar" id="sprint-today" aria-label="Go to current sprint"><img src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='24' height='24' viewBox='0 0 24 24' fill='none' stroke='%23000' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Crect x='3' y='4' width='18' height='18' rx='2' ry='2'/%3E%3Cline x1='16' y1='2' x2='16' y2='6'/%3E%3Cline x1='8' y1='2' x2='8' y2='6'/%3E%3Cline x1='3' y1='10' x2='21' y2='10'/%3E%3C/svg%3E" alt="" width="20" height="20"></button>
             <span class="month-header" id="month-header" contenteditable="true">February 2026</span>
             <button type="button" class="sprint-nav-btn" id="sprint-prev" aria-label="Previous sprint">‹</button>
             <button type="button" class="sprint-nav-btn" id="sprint-next" aria-label="Next sprint">›</button>
@@ -580,6 +646,12 @@
         </div>
       </div>
     </div>
+  </div>
+  <p class="reset-data-wrap">
+    <button type="button" class="reset-data-link" id="save-default-btn">Save as default</button>
+    <span class="reset-data-sep"> · </span>
+    <button type="button" class="reset-data-link" id="reset-data-btn">Reset data</button>
+  </p>
   </div>
   <div class="modal-overlay" id="add-contributor-modal" aria-hidden="true">
     <div class="modal-box" role="dialog" aria-labelledby="modal-title">
@@ -1058,7 +1130,10 @@
         row.dataset.customHolidays = JSON.stringify(rec.customHolidays || []);
         row.dataset.vacationOverrides = JSON.stringify(rec.vacationOverrides || {});
         row.innerHTML =
-          '<input type="text" class="contributor-input" placeholder="Name" value="' + escapeHtml(rec.name) + '" data-row="' + r + '" />' +
+          '<div class="contributor-name-wrap">' +
+            '<input type="text" class="contributor-input" placeholder="Name" value="' + escapeHtml(rec.name) + '" data-row="' + r + '" />' +
+            '<button type="button" class="contributor-row-delete" data-row="' + r + '" aria-label="Remove row">×</button>' +
+          '</div>' +
           '<input type="text" class="low-high-input low" placeholder="—" value="' + escapeHtml(rec.low) + '" data-row="' + r + '" />' +
           '<input type="text" class="low-high-input high" placeholder="—" value="' + escapeHtml(rec.high) + '" data-row="' + r + '" readonly />';
         rowsContainer.appendChild(row);
@@ -1105,31 +1180,44 @@
         updateLowFromPoints();
         saveChartData();
       }
-      document.querySelectorAll('.contributor-input, .low-high-input.low').forEach(function(el) {
-        el.addEventListener('input', onEdit);
-        el.addEventListener('change', onEdit);
-      });
-      document.querySelectorAll('.contributor-input').forEach(function(input) {
-        input.addEventListener('blur', function() {
-          if (this.value.trim().toLowerCase() !== 'delete') return;
-          var rowIndex = parseInt(this.dataset.row, 10);
-          if (isNaN(rowIndex)) return;
-          var data = getChartData();
-          if (data.rows.length <= 1) return;
-          data.rows.splice(rowIndex, 1);
-          try {
-            var toSave = { month: data.month, dates: data.dates, rows: data.rows, multiplier: data.multiplier };
-            localStorage.setItem(STORAGE_KEY, JSON.stringify(toSave));
-          } catch (e) {}
-          location.reload();
+      var rowsContainer = document.getElementById('contributor-rows');
+      var gridBody = document.getElementById('grid-body');
+      if (rowsContainer) {
+        rowsContainer.addEventListener('input', function(ev) {
+          if (ev.target.matches('.contributor-input') || ev.target.matches('.low-high-input.low')) {
+            updateLowFromPoints();
+            saveChartData();
+          }
         });
+        rowsContainer.addEventListener('change', function(ev) {
+          if (ev.target.matches('.contributor-input') || ev.target.matches('.low-high-input.low')) {
+            updateLowFromPoints();
+            saveChartData();
+          }
+        });
+      }
+      if (rowsContainer) rowsContainer.addEventListener('click', function(ev) {
+        var delBtn = ev.target.closest('.contributor-row-delete');
+        if (!delBtn) return;
+        ev.preventDefault();
+        ev.stopPropagation();
+        var row = delBtn.closest('.contributor-row');
+        if (!row) return;
+        var rows = rowsContainer.querySelectorAll('.contributor-row');
+        var rowIndex = Array.prototype.indexOf.call(rows, row);
+        if (rowIndex < 0) return;
+        var data = getChartData();
+        if (data.rows.length <= 1) return;
+        data.rows.splice(rowIndex, 1);
+        render(data);
+        updateLowFromPoints();
+        saveChartData();
       });
       document.getElementById('multiplier-input').addEventListener('input', onPointsOrMultiplierEdit);
       document.getElementById('multiplier-input').addEventListener('change', onPointsOrMultiplierEdit);
 
-      var rowsContainer = document.getElementById('contributor-rows');
-      var gridBody = document.getElementById('grid-body');
-      rowsContainer.addEventListener('dragstart', function(ev) {
+      if (rowsContainer) rowsContainer.addEventListener('dragstart', function(ev) {
+        if (ev.target.closest('.contributor-row-delete')) return;
         var row = ev.target.closest('.contributor-row');
         if (!row) return;
         var rows = rowsContainer.querySelectorAll('.contributor-row');
@@ -1137,11 +1225,11 @@
         ev.dataTransfer.setData('text/plain', String(idx));
         ev.dataTransfer.effectAllowed = 'move';
       });
-      rowsContainer.addEventListener('dragover', function(ev) {
+      if (rowsContainer) rowsContainer.addEventListener('dragover', function(ev) {
         ev.preventDefault();
         ev.dataTransfer.dropEffect = 'move';
       });
-      rowsContainer.addEventListener('drop', function(ev) {
+      if (rowsContainer) rowsContainer.addEventListener('drop', function(ev) {
         ev.preventDefault();
         var dragIndex = parseInt(ev.dataTransfer.getData('text/plain'), 10);
         if (isNaN(dragIndex)) return;
@@ -1163,7 +1251,7 @@
         rowsContainer.insertBefore(draggedContrib, insertRefContrib);
         gridBody.insertBefore(draggedGrid, insertRefGrid);
         rowsContainer.querySelectorAll('.contributor-row').forEach(function(r, i) {
-          r.querySelectorAll('.contributor-input, .low-high-input').forEach(function(inp) { inp.dataset.row = i; });
+          r.querySelectorAll('.contributor-input, .low-high-input, .contributor-row-delete').forEach(function(inp) { inp.dataset.row = i; });
         });
         gridBody.querySelectorAll('tr').forEach(function(tr, i) {
           tr.querySelectorAll('td').forEach(function(td) { td.dataset.row = i; });
@@ -1203,12 +1291,20 @@
         updateLowFromPoints();
         saveChartData();
       });
-      document.querySelectorAll('#dates-row th').forEach(function(cell) {
-        cell.addEventListener('input', onEdit);
-        cell.addEventListener('blur', onEdit);
-      });
-      document.getElementById('month-header').addEventListener('input', onEdit);
-      document.getElementById('month-header').addEventListener('blur', onEdit);
+      var gridTable = document.getElementById('grid-table');
+      if (gridTable) {
+        gridTable.addEventListener('input', function(ev) {
+          if (ev.target.closest('#dates-row')) saveChartData();
+        });
+        gridTable.addEventListener('blur', function(ev) {
+          if (ev.target.closest('#dates-row')) saveChartData();
+        }, true);
+      }
+      var monthHeaderEl = document.getElementById('month-header');
+      if (monthHeaderEl) {
+        monthHeaderEl.addEventListener('input', onEdit);
+        monthHeaderEl.addEventListener('blur', onEdit);
+      }
       document.getElementById('sprint-prev').addEventListener('click', function() {
         sprintOffset--;
         updateSprintDisplay();
@@ -1251,7 +1347,7 @@
       customDatesEl.classList.remove('open');
       modal.classList.add('open');
       modal.setAttribute('aria-hidden', 'false');
-      nameEl.focus();
+      if (nameEl) nameEl.focus();
     }
 
     var modalHolidaySelectedDates = [];
@@ -1451,7 +1547,7 @@
       var cancelBtn = document.getElementById('modal-cancel');
       var doneBtn = document.getElementById('modal-done');
 
-      btn.addEventListener('click', openAddContributorModal);
+      if (btn) btn.addEventListener('click', openAddContributorModal);
 
       function onCountryChange() {
         var titleEl = document.getElementById('modal-title');
@@ -1593,13 +1689,14 @@
         modal.setAttribute('aria-hidden', 'true');
       }
 
-      cancelBtn.addEventListener('click', closeModal);
+      if (cancelBtn) cancelBtn.addEventListener('click', closeModal);
       modal.addEventListener('click', function(e) {
         if (e.target === modal) closeModal();
       });
 
-      doneBtn.addEventListener('click', function() {
-        var country = document.getElementById('modal-country').value;
+      if (doneBtn) doneBtn.addEventListener('click', function() {
+        var country = document.getElementById('modal-country');
+        country = country ? country.value : 'us';
 
         if (country === 'new') {
           var countryNameInput = document.getElementById('modal-country-name');
@@ -1609,6 +1706,28 @@
           customCountriesList.push({ name: countryName, dates: customHolidays.slice() });
           saveCustomCountries();
           renderAllCountryOptions();
+          var nameInput = document.getElementById('modal-name');
+          var name = nameInput ? nameInput.value.trim() : '';
+          var newRow = {
+            name: name,
+            low: '',
+            high: '',
+            points: [],
+            pointSpecials: []
+          };
+          for (var i = 0; i < NUM_COLUMNS; i++) {
+            newRow.points.push('');
+            newRow.pointSpecials.push(false);
+          }
+          newRow.holidayCountry = 'custom:' + countryName;
+          try {
+            var data = getChartData();
+            if (!data.rows) data.rows = [];
+            data.rows.push(newRow);
+            render(data);
+            updateLowFromPoints();
+            saveChartData();
+          } catch (e) {}
           closeModal();
           return;
         }
@@ -1629,18 +1748,20 @@
         var holidayCountry = country || undefined;
         if (holidayCountry) newRow.holidayCountry = holidayCountry;
 
-        var data = getChartData();
-        data.rows.push(newRow);
         try {
-          var toSave = { month: data.month, dates: data.dates, rows: data.rows, multiplier: data.multiplier };
-          localStorage.setItem(STORAGE_KEY, JSON.stringify(toSave));
+          var data = getChartData();
+          if (!data.rows) data.rows = [];
+          data.rows.push(newRow);
+          render(data);
+          updateLowFromPoints();
+          saveChartData();
         } catch (e) {}
         closeModal();
-        location.reload();
       });
 
       renderAllCountryOptions();
     }
+
 
     document.addEventListener('DOMContentLoaded', function() {
       loadCustomCountries();
@@ -1658,6 +1779,31 @@
       setupWheelModal();
       if (fromHash) try { localStorage.setItem(STORAGE_KEY, JSON.stringify(data)); } catch (e) {}
       updateHashFromChart();
+
+      document.getElementById('save-default-btn').addEventListener('click', function() {
+        try {
+          var data = getChartData();
+          var jsonStr = JSON.stringify(data);
+          jsonStr = jsonStr.replace(/<\/script>/gi, '<\\/script>');
+          var html = document.documentElement.outerHTML;
+          html = html.replace(/\bEMBEDDED_DEFAULT_DATA\s*=\s*null\s*;/, 'EMBEDDED_DEFAULT_DATA = ' + jsonStr + ';');
+          var blob = new Blob([html], { type: 'text/html' });
+          var a = document.createElement('a');
+          a.href = URL.createObjectURL(blob);
+          a.download = 'velocity-chart.html';
+          a.click();
+          URL.revokeObjectURL(a.href);
+        } catch (e) {}
+      });
+      document.getElementById('reset-data-btn').addEventListener('click', function() {
+        try {
+          localStorage.removeItem(STORAGE_KEY);
+          localStorage.removeItem(CUSTOM_COUNTRIES_KEY);
+          localStorage.removeItem(REMOVED_PRESETS_KEY);
+          location.hash = '';
+          location.reload();
+        } catch (e) {}
+      });
     });
   </script>
 </body>
