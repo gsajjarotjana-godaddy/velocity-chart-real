@@ -645,6 +645,8 @@
       { name: '', low: '', high: '', points: ['', '', '', '', '', '', '', '', '', ''], pointSpecials: [] },
       { name: '', low: '', high: '', points: ['', '', '', '', '', '', '', '', '', ''], pointSpecials: [] }
     ];
+    /* Replace null with JSON from "Set as default" in the app to make that state load when opening the file. */
+    var EMBEDDED_DEFAULT_DATA = null;
 
     // Wellness days: apply to every contributor regardless of country
     var WELLNESS_DAYS = ['2026-03-13', '2026-05-15', '2026-08-14', '2026-10-09'];
@@ -892,6 +894,15 @@
           }
         }
       } catch (e) {}
+      if (EMBEDDED_DEFAULT_DATA && EMBEDDED_DEFAULT_DATA.rows && Array.isArray(EMBEDDED_DEFAULT_DATA.rows) && EMBEDDED_DEFAULT_DATA.rows.length > 0) {
+        try {
+          var data = JSON.parse(JSON.stringify(EMBEDDED_DEFAULT_DATA));
+          if (!data.month) data.month = 'February 2026';
+          if (data.dates && data.dates.length > NUM_COLUMNS) data.dates = data.dates.slice(0, NUM_COLUMNS);
+          if (!data.multiplier) data.multiplier = '0.6';
+          return data;
+        } catch (e) {}
+      }
       return {
         month: 'February 2026',
         dates: DEFAULT_DATES.slice(),
