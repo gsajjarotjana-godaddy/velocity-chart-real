@@ -906,15 +906,7 @@
       return {
         month: 'February 2026',
         dates: DEFAULT_DATES.slice(),
-        rows: DEFAULT_ROWS.map(function(r) {
-          return {
-            name: r.name,
-            low: r.low,
-            high: r.high,
-            points: (r.points || []).slice(),
-            pointSpecials: (r.pointSpecials || []).slice()
-          };
-        }),
+        rows: [],
         multiplier: '0.6'
       };
     }
