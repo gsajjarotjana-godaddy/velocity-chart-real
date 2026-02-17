@@ -857,6 +857,29 @@
       saveChartData();
     }
 
+    function getDataFromHash() {
+      try {
+        var hash = location.hash;
+        if (!hash || hash.length <= 1) return null;
+        var decoded = decodeURIComponent(hash.slice(1));
+        var data = JSON.parse(decoded);
+        if (data && data.rows && Array.isArray(data.rows) && data.rows.length > 0) {
+          if (!data.month) data.month = 'February 2026';
+          if (data.dates && data.dates.length > NUM_COLUMNS) data.dates = data.dates.slice(0, NUM_COLUMNS);
+          return data;
+        }
+      } catch (e) {}
+      return null;
+    }
+
+    function updateHashFromChart() {
+      try {
+        var data = getChartData();
+        var str = JSON.stringify(data);
+        location.replace('#' + encodeURIComponent(str));
+      } catch (e) {}
+    }
+
     function getStoredOrDefault() {
       try {
         var raw = localStorage.getItem(STORAGE_KEY);
@@ -931,7 +954,9 @@
 
     function saveChartData() {
       try {
-        localStorage.setItem(STORAGE_KEY, JSON.stringify(getChartData()));
+        var data = getChartData();
+        localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
+        updateHashFromChart();
       } catch (e) {}
     }
 
@@ -1582,7 +1607,9 @@
     document.addEventListener('DOMContentLoaded', function() {
       loadCustomCountries();
       loadRemovedPresets();
-      var data = getStoredOrDefault();
+      var data = getDataFromHash();
+      var fromHash = !!data;
+      if (!data) data = getStoredOrDefault();
       if (data.rows && data.rows.length > 3) {
         while (data.rows.length > 0 && !data.rows[data.rows.length - 1].name && data.rows.length > 3)
           data.rows.pop();
@@ -1591,6 +1618,8 @@
       attachListeners();
       setupAddContributorModal();
       setupWheelModal();
+      if (fromHash) try { localStorage.setItem(STORAGE_KEY, JSON.stringify(data)); } catch (e) {}
+      updateHashFromChart();
     });
   </script>
 </body>
