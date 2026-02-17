@@ -31,12 +31,30 @@
       flex-direction: column;
       gap: 1.5rem;
     }
+    .chart-title-wrap {
+      display: flex;
+      align-items: center;
+      gap: 0.35rem;
+      padding-top: 0.7rem;
+    }
+    .chart-title-wrap .chart-title {
+      flex: 1;
+    }
+    .chart-title-wrap img {
+      margin-left: auto;
+    }
+    .chart-title-wrap img {
+      display: block;
+      width: 20px;
+      height: 20px;
+      flex-shrink: 0;
+      margin-right: 0.75rem;
+    }
     .chart-title {
       color: #fff;
       font-size: 1.25rem;
       font-weight: 700;
       margin: 0;
-      padding-top: 0.7rem;
     }
     .contributor-section {
       display: flex;
@@ -169,6 +187,33 @@
       flex-direction: column;
       min-width: 0;
     }
+    .month-nav {
+      display: flex;
+      align-items: center;
+      gap: 0.05rem;
+      flex: 1;
+      min-width: 0;
+    }
+    .sprint-nav-btn {
+      background: transparent;
+      border: none;
+      color: #000;
+      font-size: 1.5rem;
+      line-height: 1;
+      padding: 0.25rem 0.35rem;
+      cursor: pointer;
+      border-radius: 4px;
+    }
+    .sprint-nav-btn:hover {
+      background: rgba(0,0,0,0.08);
+    }
+    .sprint-nav-calendar {
+      font-size: 1.1rem;
+    }
+    .sprint-nav-calendar img {
+      display: block;
+      margin-top: -1px;
+    }
     .month-header {
       background: #D8EFEF;
       color: #000;
@@ -176,7 +221,8 @@
       padding: 0.4rem 0.75rem;
       padding-left: 9px;
       font-size: 18px;
-      flex: 1;
+      flex: 0 1 auto;
+      min-width: 0;
       display: flex;
       align-items: center;
       text-align: left;
@@ -234,14 +280,17 @@
       width: 1%;
       text-align: center;
       font-size: 14px;
-      cursor: text;
+      cursor: pointer;
     }
     .grid-table td:focus {
-      outline: 2px solid #fff;
-      outline-offset: -2px;
+      outline: none;
     }
     .grid-table td.special {
       background: #add8e6;
+    }
+    .grid-table td.island {
+      background: #D8EFEF;
+      font-size: 11px;
     }
     .contributor-name-cell {
       background: #2d2d2d;
@@ -257,7 +306,10 @@
 <body>
   <div class="chart-wrapper" id="chart-wrapper">
     <div class="left-panel">
-      <h1 class="chart-title">Velocity Chart</h1>
+      <div class="chart-title-wrap">
+        <h1 class="chart-title">Velocity Chart</h1>
+        <img src="plus.svg" alt="" width="20" height="20">
+      </div>
       <div class="contributor-section">
         <div class="contributor-header-row">
           <span class="contributor-header">Contributor</span>
@@ -270,7 +322,12 @@
     <div class="teal-wrapper">
       <div class="right-panel">
         <div class="top-bar">
-          <div class="month-header" id="month-header" contenteditable="true">February 2026</div>
+          <div class="month-nav">
+            <button type="button" class="sprint-nav-btn sprint-nav-calendar" id="sprint-today" aria-label="Go to current sprint"><img src="calendar.svg" alt="" width="20" height="20"></button>
+            <span class="month-header" id="month-header" contenteditable="true">February 2026</span>
+            <button type="button" class="sprint-nav-btn" id="sprint-prev" aria-label="Previous sprint">‹</button>
+            <button type="button" class="sprint-nav-btn" id="sprint-next" aria-label="Next sprint">›</button>
+          </div>
           <div class="multiplier-section">
             <span class="multiplier-label" id="multiplier-label" contenteditable="true">Points Multiplier (Low)</span>
             <input type="text" class="multiplier-value" id="multiplier-input" value="0.6" />
@@ -296,6 +353,144 @@
       { name: '', low: '', high: '', points: ['', '', '', '', '', '', '', '', '', ''], pointSpecials: [] },
       { name: '', low: '', high: '', points: ['', '', '', '', '', '', '', '', '', ''], pointSpecials: [] }
     ];
+
+    // Wellness days: apply to every contributor regardless of country
+    var WELLNESS_DAYS = ['2026-03-13', '2026-05-15', '2026-08-14', '2026-10-09'];
+
+    var HOLIDAYS_BY_PERSON = [
+      { names: ['sayan', 'raul', 'raúl'], dates: ['2026-01-01','2026-01-12','2026-03-13','2026-03-23','2026-04-02','2026-04-03','2026-05-01','2026-05-15','2026-05-18','2026-06-08','2026-06-15','2026-06-29','2026-07-20','2026-08-07','2026-08-14','2026-08-17','2026-10-09','2026-10-12','2026-11-02','2026-11-16','2026-12-08','2026-12-25'] },
+      { names: ['nadia'], dates: ['2026-01-01','2026-02-16','2026-03-13','2026-04-03','2026-05-15','2026-05-18','2026-07-01','2026-08-03','2026-08-14','2026-09-07','2026-09-30','2026-10-09','2026-10-12','2026-12-25','2026-12-28'] },
+      { names: ['shriya', 'eileen', 'arissa', 'grace', 'alexis'], dates: ['2026-01-01','2026-01-19','2026-03-13','2026-05-15','2026-05-25','2026-06-19','2026-07-03','2026-08-14','2026-09-07','2026-10-09','2026-11-11','2026-11-26','2026-11-27','2026-12-25'] }
+    ];
+
+    function gridDateToISO(dateStr) {
+      if (!dateStr || !/^\d{1,2}\/\d{1,2}\/\d{2}$/.test(dateStr)) return '';
+      var parts = dateStr.split('/');
+      var m = parseInt(parts[0], 10);
+      var d = parseInt(parts[1], 10);
+      var y2 = parseInt(parts[2], 10);
+      var year = y2 < 50 ? 2000 + y2 : 1900 + y2;
+      return year + '-' + (m < 10 ? '0' : '') + m + '-' + (d < 10 ? '0' : '') + d;
+    }
+
+    function getHolidayDatesForName(name) {
+      if (!name || !name.trim()) return [];
+      var lower = name.trim().toLowerCase();
+      for (var i = 0; i < HOLIDAYS_BY_PERSON.length; i++) {
+        for (var j = 0; j < HOLIDAYS_BY_PERSON[i].names.length; j++) {
+          if (lower.indexOf(HOLIDAYS_BY_PERSON[i].names[j]) !== -1) return HOLIDAYS_BY_PERSON[i].dates;
+        }
+      }
+      return [];
+    }
+
+    function isHolidayForPerson(dateStr, name) {
+      var iso = gridDateToISO(dateStr);
+      if (!iso) return false;
+      if (WELLNESS_DAYS.indexOf(iso) !== -1) return true;
+      var holidays = getHolidayDatesForName(name);
+      return holidays.indexOf(iso) !== -1;
+    }
+
+    function getSprintStartTuesday(d) {
+      var date = new Date(d.getFullYear(), d.getMonth(), d.getDate());
+      var day = date.getDay();
+      var daysUntilTuesday = (2 - day + 7) % 7;
+      date.setDate(date.getDate() + daysUntilTuesday);
+      return date;
+    }
+
+    function getNextWorkDay(d) {
+      var next = new Date(d.getFullYear(), d.getMonth(), d.getDate());
+      next.setDate(next.getDate() + 1);
+      while (next.getDay() === 0 || next.getDay() === 6) {
+        next.setDate(next.getDate() + 1);
+      }
+      return next;
+    }
+
+    function formatDateForDisplay(d) {
+      var month = d.getMonth() + 1;
+      var day = d.getDate();
+      var year = String(d.getFullYear()).slice(-2);
+      return month + '/' + day + '/' + year;
+    }
+
+    var SPRINT_CALENDAR_DAYS = 14;
+
+    function getSprintDatesForOffset(offset) {
+      var baseStart = getSprintStartTuesday(new Date());
+      var start = new Date(baseStart.getFullYear(), baseStart.getMonth(), baseStart.getDate());
+      start.setDate(start.getDate() + offset * SPRINT_CALENDAR_DAYS);
+      var dates = [];
+      var d = new Date(start.getFullYear(), start.getMonth(), start.getDate());
+      for (var i = 0; i < NUM_COLUMNS; i++) {
+        dates.push(formatDateForDisplay(d));
+        d = getNextWorkDay(d);
+      }
+      return dates;
+    }
+
+    function getSprintMonthLabelForOffset(offset) {
+      var dates = getSprintDatesForOffset(offset);
+      if (dates.length === 0) return 'February 2026';
+      var first = dates[0].split('/');
+      var last = dates[dates.length - 1].split('/');
+      var monthNames = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
+      var m1 = parseInt(first[0], 10) - 1;
+      var m2 = parseInt(last[0], 10) - 1;
+      var y1 = 2000 + parseInt(first[2], 10);
+      var y2 = 2000 + parseInt(last[2], 10);
+      if (m1 === m2 && y1 === y2) return monthNames[m1] + ' ' + y1;
+      return monthNames[m1] + ' ' + y1 + ' – ' + monthNames[m2] + ' ' + y2;
+    }
+
+    function getSprintDates() {
+      return getSprintDatesForOffset(0);
+    }
+
+    function getSprintMonthLabel() {
+      return getSprintMonthLabelForOffset(0);
+    }
+
+    var sprintOffset = 0;
+
+    function updateSprintDisplay() {
+      var dates = getSprintDatesForOffset(sprintOffset);
+      var monthLabel = getSprintMonthLabelForOffset(sprintOffset);
+      document.getElementById('month-header').textContent = monthLabel;
+      var dateCells = document.querySelectorAll('#dates-row th');
+      for (var i = 0; i < dateCells.length && i < dates.length; i++) {
+        dateCells[i].textContent = dates[i];
+        dateCells[i].className = dates[i] ? '' : 'empty';
+      }
+      // Re-apply holiday logic for this sprint's dates so islands show correctly
+      var gridRows = document.querySelectorAll('#grid-body tr');
+      var rowContainers = document.querySelectorAll('#contributor-rows .contributor-row');
+      for (var r = 0; r < gridRows.length; r++) {
+        var name = '';
+        if (rowContainers[r]) {
+          var nameEl = rowContainers[r].querySelector('.contributor-input');
+          if (nameEl) name = nameEl.value.trim();
+        }
+        var cells = gridRows[r].querySelectorAll('td');
+        for (var c = 0; c < cells.length && c < dates.length; c++) {
+          var dateStr = dates[c];
+          var isHoliday = isHolidayForPerson(dateStr, name);
+          var td = cells[c];
+          if (isHoliday) {
+            td.textContent = '\u{1F334}';
+            td.classList.add('island');
+          } else {
+            var cur = td.textContent.trim();
+            if (cur === '\u{1F334}' || cur === '') td.textContent = '2';
+            td.classList.remove('island');
+          }
+        }
+      }
+      updateLowFromPoints();
+      saveChartData();
+    }
 
     function getStoredOrDefault() {
       try {
@@ -367,6 +562,30 @@
       } catch (e) {}
     }
 
+    var HIGH_MULTIPLIER = 0.8;
+
+    function updateLowFromPoints() {
+      var multiplier = parseFloat(document.getElementById('multiplier-input').value, 10) || 0.6;
+      var gridRows = document.querySelectorAll('#grid-body tr');
+      var rowContainers = document.querySelectorAll('#contributor-rows .contributor-row');
+      for (var r = 0; r < gridRows.length; r++) {
+        var cells = gridRows[r].querySelectorAll('td');
+        var sum = 0;
+        for (var c = 0; c < cells.length; c++) {
+          var val = parseFloat(cells[c].textContent.trim(), 10);
+          if (!isNaN(val)) sum += val;
+        }
+        var low = Math.round(sum * multiplier);
+        var high = Math.round(sum * HIGH_MULTIPLIER);
+        if (rowContainers[r]) {
+          var lowEl = rowContainers[r].querySelector('.low-high-input.low');
+          var highEl = rowContainers[r].querySelector('.low-high-input.high');
+          if (lowEl) lowEl.value = low;
+          if (highEl) highEl.value = high;
+        }
+      }
+    }
+
     function render(data) {
       var r, c, row, cell, tr, td;
       var rowsContainer = document.getElementById('contributor-rows');
@@ -374,10 +593,9 @@
       var gridBody = document.getElementById('grid-body');
       var monthHeader = document.getElementById('month-header');
 
-      monthHeader.textContent = data.month || 'February 2026';
+      var dates = getSprintDates();
+      monthHeader.textContent = getSprintMonthLabel();
       datesRow.innerHTML = '';
-      var dates = (data.dates && data.dates.length ? data.dates : DEFAULT_DATES).slice(0, NUM_COLUMNS);
-      while (dates.length < NUM_COLUMNS) dates.push('');
       for (c = 0; c < NUM_COLUMNS; c++) {
         cell = document.createElement('th');
         cell.className = dates[c] ? '' : 'empty';
@@ -408,8 +626,16 @@
         while (specials.length < NUM_COLUMNS) specials.push(false);
         for (c = 0; c < NUM_COLUMNS; c++) {
           td = document.createElement('td');
-          td.contentEditable = 'true';
-          td.textContent = points[c] || '';
+          var dateStr = dates[c];
+          var isHoliday = isHolidayForPerson(dateStr, rec.name);
+          var pt;
+          if (isHoliday) {
+            pt = '\u{1F334}';
+          } else {
+            pt = (points[c] && points[c] !== '\u{1F334}') ? points[c] : '2';
+          }
+          td.textContent = pt;
+          if (pt === '\u{1F334}') td.classList.add('island');
           if (specials[c]) td.classList.add('special');
           td.dataset.row = r;
           td.dataset.col = c;
@@ -419,6 +645,7 @@
       }
 
       document.getElementById('multiplier-input').value = data.multiplier != null ? data.multiplier : '0.6';
+      updateLowFromPoints();
     }
 
     function escapeHtml(s) {
@@ -430,13 +657,28 @@
 
     function attachListeners() {
       function onEdit() { saveChartData(); }
-      document.querySelectorAll('.contributor-input, .low-high-input, .multiplier-value').forEach(function(el) {
+      function onPointsOrMultiplierEdit() {
+        updateLowFromPoints();
+        saveChartData();
+      }
+      document.querySelectorAll('.contributor-input, .low-high-input').forEach(function(el) {
         el.addEventListener('input', onEdit);
         el.addEventListener('change', onEdit);
       });
+      document.getElementById('multiplier-input').addEventListener('input', onPointsOrMultiplierEdit);
+      document.getElementById('multiplier-input').addEventListener('change', onPointsOrMultiplierEdit);
       document.querySelectorAll('#grid-body td').forEach(function(td) {
-        td.addEventListener('input', onEdit);
-        td.addEventListener('blur', onEdit);
+        td.addEventListener('click', function(e) {
+          if (this.classList.contains('island')) {
+            this.textContent = '2';
+            this.classList.remove('island');
+          } else {
+            this.textContent = '\u{1F334}';
+            this.classList.add('island');
+          }
+          updateLowFromPoints();
+          saveChartData();
+        });
       });
       document.querySelectorAll('#dates-row th').forEach(function(cell) {
         cell.addEventListener('input', onEdit);
@@ -444,6 +686,18 @@
       });
       document.getElementById('month-header').addEventListener('input', onEdit);
       document.getElementById('month-header').addEventListener('blur', onEdit);
+      document.getElementById('sprint-prev').addEventListener('click', function() {
+        sprintOffset--;
+        updateSprintDisplay();
+      });
+      document.getElementById('sprint-next').addEventListener('click', function() {
+        sprintOffset++;
+        updateSprintDisplay();
+      });
+      document.getElementById('sprint-today').addEventListener('click', function() {
+        sprintOffset = 0;
+        updateSprintDisplay();
+      });
     }
 
     document.addEventListener('DOMContentLoaded', function() {
